@@ -37,11 +37,11 @@ public class MultiStepDialerController : MonoBehaviour
         public Button autoFillButton;
     }
 
-    [Header("Keypad / Calculator Buttons")]
-    [Tooltip("Assign numeric buttons (0-9). The script will automatically assign click listeners based on button text or index.")]
-    public Button[] digitButtons;
-    public Button decimalButton;
-    public Button backspaceButton;
+    // [Header("Keypad / Calculator Buttons")]
+    // [Tooltip("Assign numeric buttons (0-9). The script will automatically assign click listeners based on button text or index.")]
+    // public Button[] digitButtons;
+    // public Button decimalButton;
+    // public Button backspaceButton;
 
     [Header("Mapped Configurations")]
     [SerializeField] private List<DialerPageConfig> pageConfigs = new List<DialerPageConfig>();
@@ -63,10 +63,10 @@ public class MultiStepDialerController : MonoBehaviour
     private int wrongAttempts;
     private bool solved;
 
-    private void Start()
-    {
-        SetupKeypadListeners();
-    }
+    // private void Start()
+    // {
+    //     SetupKeypadListeners();
+    // }
 
     private void OnEnable()
     {
@@ -81,36 +81,36 @@ public class MultiStepDialerController : MonoBehaviour
     /// <summary>
     /// Dynamically binds click listeners to calculator buttons in code.
     /// </summary>
-    private void SetupKeypadListeners()
-    {
-        // Setup digit buttons (0-9)
-        for (int i = 0; i < digitButtons.Length; i++)
-        {
-            if (digitButtons[i] != null)
-            {
-                // Try reading text from button label, otherwise fall back to array index string
-                TMP_Text btnText = digitButtons[i].GetComponentInChildren<TMP_Text>();
-                string digitValue = (btnText != null && !string.IsNullOrEmpty(btnText.text)) ? btnText.text.Trim() : i.ToString();
+    // private void SetupKeypadListeners()
+    // {
+    //     // Setup digit buttons (0-9)
+    //     for (int i = 0; i < digitButtons.Length; i++)
+    //     {
+    //         if (digitButtons[i] != null)
+    //         {
+    //             // Try reading text from button label, otherwise fall back to array index string
+    //             TMP_Text btnText = digitButtons[i].GetComponentInChildren<TMP_Text>();
+    //             string digitValue = (btnText != null && !string.IsNullOrEmpty(btnText.text)) ? btnText.text.Trim() : i.ToString();
 
-                digitButtons[i].onClick.RemoveAllListeners();
-                digitButtons[i].onClick.AddListener(() => OnDigitPressed(digitValue));
-            }
-        }
+    //             digitButtons[i].onClick.RemoveAllListeners();
+    //             digitButtons[i].onClick.AddListener(() => OnDigitPressed(digitValue));
+    //         }
+    //     }
 
-        // Setup decimal button
-        if (decimalButton != null)
-        {
-            decimalButton.onClick.RemoveAllListeners();
-            decimalButton.onClick.AddListener(OnDecimalPressed);
-        }
+    //     // Setup decimal button
+    //     if (decimalButton != null)
+    //     {
+    //         decimalButton.onClick.RemoveAllListeners();
+    //         decimalButton.onClick.AddListener(OnDecimalPressed);
+    //     }
 
-        // Setup backspace button
-        if (backspaceButton != null)
-        {
-            backspaceButton.onClick.RemoveAllListeners();
-            backspaceButton.onClick.AddListener(OnBackspacePressed);
-        }
-    }
+    //     // Setup backspace button
+    //     if (backspaceButton != null)
+    //     {
+    //         backspaceButton.onClick.RemoveAllListeners();
+    //         backspaceButton.onClick.AddListener(OnBackspacePressed);
+    //     }
+    // }
 
     private void HandlePageChanged(int pageIndex)
     {
