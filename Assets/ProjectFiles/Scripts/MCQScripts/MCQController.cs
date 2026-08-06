@@ -2,21 +2,26 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 public class MCQController : MonoBehaviour
 {
+    // ================= PANELS =================
     [Header("Panels")]
     public GameObject mcqPanel;
     public GameObject explanationPanel;
 
+    // ================= QUESTION UI =================
     [Header("Question UI")]
     public TMP_Text questionText;
     public Image referenceImage;
 
+    // ================= OPTIONS =================
     [Header("Options")]
     public Button[] optionButtons;
     public TMP_Text[] optionTexts;
 
+    // ================= EXPLANATION =================
     [Header("Explanation UI")]
     public TMP_Text explanationText;
     public Button explanationActionButton;
@@ -25,18 +30,25 @@ public class MCQController : MonoBehaviour
     public Button rightExplanationButton;
     public Button wrongExplanationButton;
 
+    // ================= VISUALS =================
     [Header("Sprites")]
     public Sprite defaultButtonSprite;
     public Sprite correctSprite;
     public Sprite wrongSprite;
 
+    // ================= DATA =================
     [Header("Data")]
     public MCQQuestionData questionData;
 
+    // ================= AUDIO =================
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip correctClip;
     public AudioClip wrongClip;
+
+    // ================= EVENTS =================
+    [Header("Events")]
+    public UnityEvent OnCorrectAnswer;   // ✅ NEW EVENT
 
     // ================= STATE =================
     class MCQState
@@ -55,6 +67,8 @@ public class MCQController : MonoBehaviour
         BindButtons();
         RestoreState();
     }
+
+    // ================= LOAD =================
 
     void LoadQuestion()
     {
@@ -92,6 +106,8 @@ public class MCQController : MonoBehaviour
         HideExplanationButtons();
     }
 
+    // ================= RESTORE =================
+
     void RestoreState()
     {
         foreach (int wrong in state.wrongAttempts)
@@ -110,6 +126,8 @@ public class MCQController : MonoBehaviour
         }
     }
 
+    // ================= ANSWER LOGIC =================
+
     void OnOptionSelected(int index)
     {
         bool isCorrect = index == questionData.correctOptionIndex;
@@ -117,7 +135,7 @@ public class MCQController : MonoBehaviour
         if (isCorrect)
         {
             if (state.answeredCorrectly)
-                return; // 🔒 Prevent double trigger
+                return; // 🔒 Prevent double fire
 
             state.answeredCorrectly = true;
 
@@ -127,8 +145,7 @@ public class MCQController : MonoBehaviour
             DisableAllOptions();
             ShowRightExplanation();
 
-            // 🔥 KEY CHANGE → Unlock Navigation
-            PageNavigationController.RequestNavigationUnlock();
+            OnCorrectAnswer?.Invoke(); // ✅ EVENT TRIGGERED
         }
         else
         {
@@ -142,6 +159,8 @@ public class MCQController : MonoBehaviour
             ShowWrongExplanation();
         }
     }
+
+    // ================= EXPLANATION FLOW =================
 
     void BindButtons()
     {
@@ -166,6 +185,8 @@ public class MCQController : MonoBehaviour
         mcqPanel.SetActive(true);
     }
 
+    // ================= UI HELPERS =================
+
     void DisableAllOptions()
     {
         foreach (var btn in optionButtons)
@@ -189,6 +210,8 @@ public class MCQController : MonoBehaviour
         wrongExplanationButton.gameObject.SetActive(true);
         rightExplanationButton.gameObject.SetActive(false);
     }
+
+    // ================= AUDIO =================
 
     void PlaySound(AudioClip clip)
     {
