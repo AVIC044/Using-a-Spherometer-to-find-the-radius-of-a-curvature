@@ -12,15 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d01fd2d64a9249049aaa77d5c12a82fe, type: 3}
   m_Name: Question 5
   m_EditorClassIdentifier: Assembly-CSharp::MCQQuestionData
-  questionText: Which of the following entries is called the sagitta?
-  referenceImage: {fileID: 0}
-  explanationText: 'The difference in the heights of the tips of the three legs and
-    the central screw is called sagitta, which
+  questionText: 'What is the correct formula for calculating the
 
-    is given by h1 - h2.'
+    radius of curvature?'
+  referenceImage: {fileID: 0}
+  explanationText: 'I = 3 cm h = 0.060 cm
+
+    R = 3<sup> 2 </sup> /6(0.060)+0.060/2
+
+    R
+    = 25+0.03
+
+
+    R ~ 25 cm
+
+
+
+'
   options:
-  - x'
-  - y'
-  - z'
-  - h1-h2
-  correctOptionIndex: 3
+  - R = I<sup>2</sup>/6h + h/2
+  - R = I<sup>2</sup>/2h + h/6
+  - R = 6I<sup>2</sup>/6h + h/2
+  - R = 2I<sup>2</sup>/h + h/6
+  correctOptionIndex: 0
