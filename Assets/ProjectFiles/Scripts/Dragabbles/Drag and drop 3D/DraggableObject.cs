@@ -6,22 +6,27 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(Collider))]
 public class DraggableObject : MonoBehaviour
 {
-    [System.Serializable]
+   [System.Serializable]
     public class SnapElement
     {
-        public int index;
+        public int index; // Page/Step Index
         public bool unlocknavigationOnSnap = true;
+
+        [Header("Standard Highlight (Ignored if Is Spherometer is checked)")]
         public GameObject highlightObject;
+
+        [Header("Spherometer Target Mapping")]
+        [Tooltip("Index from 'Spherometer Targets' array for this step (0 = Table, 1 = Convex Lens, 2 = Glass Plate, etc.).")]
+        public int targetPointIndex = 0;
+
         public bool restoreToSnapWhenConditionActive = true;
         public UnityEvent OnSnapCompleted;
 
-        // ✅ NEW FEATURE
         [Header("Display Options")]
         [Tooltip("If enabled, first time this index is reached, interaction will be ignored.")]
         public bool enableFirstIgnore = false;
 
         [HideInInspector] public bool hasVisitedOnce = false;
-
         [HideInInspector] public Collider highlightCollider;
 
         // ===============================
@@ -30,6 +35,18 @@ public class DraggableObject : MonoBehaviour
         [Tooltip("True once snapping is completed. Dragging will be disabled.")]
         public bool snapped;
     }
+
+    [Header("Spherometer Settings")]
+    [Tooltip("Check this if this object is a Spherometer requiring mapped target positioning.")]
+    [SerializeField] private bool isSpherometer = false;
+
+    // ✅ Single Shared Highlight Object for Spherometer Mode
+    [Tooltip("Single shared highlight object used across all spherometer steps.")]
+    [SerializeField] private GameObject spherometerHighlightObject;
+
+    // ✅ Central Master Target Array
+    [Tooltip("Master list of target Transforms in scene (e.g., Index 0: Table, Index 1: Lens, Index 2: Glass Plate).")]
+    [SerializeField] private Transform[] spherometerTargets;
 
     [Header("Snap Elements")]
     [SerializeField] private List<SnapElement> elements = new List<SnapElement>();
@@ -56,6 +73,7 @@ public class DraggableObject : MonoBehaviour
 
     private Camera mainCam;
     private Collider objectCollider;
+    private Collider spherometerHighlightCollider;
 
     private bool isDragging;
     private bool snapping;
@@ -65,6 +83,7 @@ public class DraggableObject : MonoBehaviour
 
     private int activeElementIndex = -1;
     private int lastSnappedElementIndex = -1;
+    private Transform lastSnappedTargetTransform;
 
     private Vector3 offset;
     private float objectScreenZ;
@@ -85,6 +104,14 @@ public class DraggableObject : MonoBehaviour
         originalPosition = transform.position;
         originalRotation = transform.rotation;
 
+        // Cache shared Spherometer Highlight Collider
+        if (spherometerHighlightObject != null)
+        {
+            spherometerHighlightCollider = spherometerHighlightObject.GetComponent<Collider>();
+            spherometerHighlightObject.SetActive(false);
+        }
+
+        // Cache standard individual Highlight Colliders
         foreach (var element in elements)
         {
             if (element.highlightObject != null)
@@ -140,19 +167,25 @@ public class DraggableObject : MonoBehaviour
         interactionLocked = false;
 
         var element = elements[index];
+        GameObject activeHighlight = GetActiveHighlightObject(element);
+        Transform targetTransform = GetActiveTargetTransform(element);
 
-        // ✅ NEW LOGIC: First-time ignore
+        // Reposition highlight object to active target
+        if (activeHighlight != null && targetTransform != null)
+        {
+            activeHighlight.transform.position = targetTransform.position;
+            activeHighlight.transform.rotation = targetTransform.rotation;
+        }
+
+        // First-time ignore logic
         if (element.enableFirstIgnore && !element.hasVisitedOnce)
         {
             element.hasVisitedOnce = true;
-
             canDrag = false;
             interactionLocked = true;
-
             return;
         }
 
-        // mark visited
         element.hasVisitedOnce = true;
 
         if (element.snapped)
@@ -165,15 +198,18 @@ public class DraggableObject : MonoBehaviour
             canDrag = true;
         }
 
-        if (element.restoreToSnapWhenConditionActive &&
-            element.snapped &&
-            element.highlightObject != null)
+        if (element.restoreToSnapWhenConditionActive && element.snapped)
         {
-            Transform t = element.highlightObject.transform;
-            transform.position = t.position;
+            Transform t = (isSpherometer && lastSnappedTargetTransform != null) 
+                ? lastSnappedTargetTransform 
+                : targetTransform;
 
-            if (snapRotation)
-                transform.rotation = t.rotation;
+            if (t != null)
+            {
+                transform.position = t.position;
+                if (snapRotation)
+                    transform.rotation = t.rotation;
+            }
         }
     }
 
@@ -235,8 +271,15 @@ public class DraggableObject : MonoBehaviour
                 objectScreenZ = mainCam.WorldToScreenPoint(transform.position).z;
                 offset = transform.position - GetWorldPosition(inputPos);
 
-                if (element.highlightObject != null)
-                    element.highlightObject.SetActive(true);
+                GameObject activeHighlight = GetActiveHighlightObject(element);
+                Transform targetTransform = GetActiveTargetTransform(element);
+
+                if (activeHighlight != null && targetTransform != null)
+                {
+                    activeHighlight.transform.position = targetTransform.position;
+                    activeHighlight.transform.rotation = targetTransform.rotation;
+                    activeHighlight.SetActive(true);
+                }
             }
         }
     }
@@ -260,15 +303,16 @@ public class DraggableObject : MonoBehaviour
         }
 
         var element = elements[activeElementIndex];
+        Collider targetCollider = GetActiveHighlightCollider(element);
 
-        if (element.highlightCollider == null)
+        if (targetCollider == null)
         {
             StartReturn();
             EnableAnimator();
             return;
         }
 
-        bool inside = objectCollider.bounds.Intersects(element.highlightCollider.bounds);
+        bool inside = objectCollider.bounds.Intersects(targetCollider.bounds);
 
         if (triggerEventOnly)
         {
@@ -278,9 +322,11 @@ public class DraggableObject : MonoBehaviour
                 {
                     element.snapped = true;
                     lastSnappedElementIndex = activeElementIndex;
+                    lastSnappedTargetTransform = GetActiveTargetTransform(element);
 
-                    if (element.highlightObject != null)
-                        element.highlightObject.SetActive(false);
+                    GameObject activeHighlight = GetActiveHighlightObject(element);
+                    if (activeHighlight != null)
+                        activeHighlight.SetActive(false);
 
                     element.OnSnapCompleted?.Invoke();
 
@@ -314,14 +360,13 @@ public class DraggableObject : MonoBehaviour
     void SnapToHighlight()
     {
         var element = elements[activeElementIndex];
+        Transform target = GetActiveTargetTransform(element);
 
-        if (element.highlightObject == null)
+        if (target == null)
         {
             StartReturn();
             return;
         }
-
-        Transform target = element.highlightObject.transform;
 
         transform.position = Vector3.Lerp(transform.position, target.position, snapSpeed * Time.deltaTime);
 
@@ -339,12 +384,14 @@ public class DraggableObject : MonoBehaviour
 
             element.snapped = true;
             lastSnappedElementIndex = activeElementIndex;
+            lastSnappedTargetTransform = target;
 
             canDrag = false;
             interactionLocked = true;
 
-            if (element.highlightObject != null)
-                element.highlightObject.SetActive(false);
+            GameObject activeHighlight = GetActiveHighlightObject(element);
+            if (activeHighlight != null)
+                activeHighlight.SetActive(false);
 
             element.OnSnapCompleted?.Invoke();
 
@@ -362,9 +409,10 @@ public class DraggableObject : MonoBehaviour
         if (activeElementIndex >= 0)
         {
             var element = elements[activeElementIndex];
+            GameObject activeHighlight = GetActiveHighlightObject(element);
 
-            if (element.highlightObject != null)
-                element.highlightObject.SetActive(false);
+            if (activeHighlight != null)
+                activeHighlight.SetActive(false);
         }
     }
 
@@ -372,10 +420,16 @@ public class DraggableObject : MonoBehaviour
     {
         Vector3 targetPos = originalPosition;
 
-        if (lastSnappedElementIndex >= 0 &&
-            elements[lastSnappedElementIndex].highlightObject != null)
+        if (lastSnappedElementIndex >= 0)
         {
-            targetPos = elements[lastSnappedElementIndex].highlightObject.transform.position;
+            if (lastSnappedTargetTransform != null)
+            {
+                targetPos = lastSnappedTargetTransform.position;
+            }
+            else if (elements[lastSnappedElementIndex].highlightObject != null)
+            {
+                targetPos = elements[lastSnappedElementIndex].highlightObject.transform.position;
+            }
         }
 
         transform.position = Vector3.Lerp(transform.position, targetPos, returnSpeed * Time.deltaTime);
@@ -387,6 +441,42 @@ public class DraggableObject : MonoBehaviour
 
             EnableAnimator();
         }
+    }
+
+    // ==========================================
+    // 🛠️ HELPER METHODS (Spherometer Fallbacks)
+    // ==========================================
+
+    private GameObject GetActiveHighlightObject(SnapElement element)
+    {
+        if (isSpherometer && spherometerHighlightObject != null)
+            return spherometerHighlightObject;
+
+        return element.highlightObject;
+    }
+
+    private Collider GetActiveHighlightCollider(SnapElement element)
+    {
+        if (isSpherometer && spherometerHighlightCollider != null)
+            return spherometerHighlightCollider;
+
+        return element.highlightCollider;
+    }
+
+    private Transform GetActiveTargetTransform(SnapElement element)
+    {
+        if (isSpherometer && spherometerTargets != null && spherometerTargets.Length > 0)
+        {
+            if (element.targetPointIndex >= 0 && element.targetPointIndex < spherometerTargets.Length)
+            {
+                return spherometerTargets[element.targetPointIndex];
+            }
+
+            Debug.LogWarning($"[DraggableObject] Index {element.targetPointIndex} out of bounds for spherometerTargets.");
+            return null;
+        }
+
+        return element.highlightObject != null ? element.highlightObject.transform : null;
     }
 
     void EnableAnimator()
