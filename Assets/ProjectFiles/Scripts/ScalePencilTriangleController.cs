@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ScalePencilTriangleController : MonoBehaviour
 {
@@ -28,6 +29,13 @@ public class ScalePencilTriangleController : MonoBehaviour
     [Header("Pencil Paper Height")]
     [SerializeField] private float pencilPaperOffset = 0.02f;
 
+    [Header("Slide Sync")]
+    [Tooltip("Page indices on which this controller accepts input. Leave empty to allow on any page.")]
+    [SerializeField] private List<int> activePageIndices = new List<int>();
+
+    [Tooltip("If true, the pencil/scale/lines reset to their original state whenever the page changes away from an active index.")]
+    [SerializeField] private bool resetOnPageLeave = true;
+
     // =========================================================
     // STATE
     // =========================================================
@@ -49,6 +57,8 @@ public class ScalePencilTriangleController : MonoBehaviour
 
     private int sequenceStep = 0;
     private int scaleTapStep = 0;
+
+    private bool isActiveOnCurrentPage = true;
 
     private Vector3 pencilOffset;
 
@@ -303,14 +313,15 @@ public class ScalePencilTriangleController : MonoBehaviour
         );
 
     // =========================================================
-    // START
+    // AWAKE (runs before OnEnable, so original transforms are
+    // captured before HandlePageChanged can possibly reset them)
     // =========================================================
 
-    private void Start()
-    {
-        if (mainCamera == null)
-            mainCamera = Camera.main;
+    private bool hasOriginalScaleTransform;
+    private bool hasOriginalPencilTransform;
 
+    private void Awake()
+    {
         if (scaleObject != null)
         {
             originalScalePosition =
@@ -321,6 +332,8 @@ public class ScalePencilTriangleController : MonoBehaviour
 
             originalScaleSize =
                 scaleObject.transform.localScale;
+
+            hasOriginalScaleTransform = true;
         }
 
         if (pencilObject != null)
@@ -333,7 +346,83 @@ public class ScalePencilTriangleController : MonoBehaviour
 
             originalPencilScale =
                 pencilObject.transform.localScale;
+
+            hasOriginalPencilTransform = true;
         }
+    }
+
+    // =========================================================
+    // SLIDE SYNC
+    // =========================================================
+
+    private void OnEnable()
+    {
+        PageNavigationController.OnPageChanged += HandlePageChanged;
+        HandlePageChanged(PageNavigationController.CurrentIndex);
+    }
+
+    private void OnDisable()
+    {
+        PageNavigationController.OnPageChanged -= HandlePageChanged;
+    }
+
+    private void HandlePageChanged(int pageIndex)
+    {
+        isActiveOnCurrentPage = activePageIndices.Count == 0 || activePageIndices.Contains(pageIndex);
+
+        if (!isActiveOnCurrentPage && resetOnPageLeave)
+            ResetSequence();
+    }
+
+    private void ResetSequence()
+    {
+        StopAllCoroutines();
+
+        draggingPencil = false;
+        scaleMoving = false;
+
+        pencilAtPointA = false;
+        pencilMovingToA = false;
+
+        pencilWasAtPointB = false;
+        line1Shown = false;
+        line2Shown = false;
+        line3Shown = false;
+
+        scaleReachedBC = false;
+        scaleReachedAC = false;
+        pencilSnappingToC = false;
+
+        sequenceStep = 0;
+        scaleTapStep = 0;
+
+        if (scaleObject != null && hasOriginalScaleTransform)
+        {
+            scaleObject.transform.position = originalScalePosition;
+            scaleObject.transform.rotation = originalScaleRotation;
+            scaleObject.transform.localScale = originalScaleSize;
+        }
+
+        if (pencilObject != null && hasOriginalPencilTransform)
+        {
+            pencilObject.transform.position = originalPencilPosition;
+            pencilObject.transform.rotation = originalPencilRotation;
+            pencilObject.transform.localScale = originalPencilScale;
+        }
+
+        if (line1Image != null) line1Image.SetActive(false);
+        if (line2Image != null) line2Image.SetActive(false);
+        if (line3Image != null) line3Image.SetActive(false);
+    }
+
+    // =========================================================
+    // START
+    // =========================================================
+
+    private void Start()
+    {
+        if (mainCamera == null)
+            mainCamera = Camera.main;
 
         Debug.Log("SCALE PENCIL CONTROLLER STARTED");
     }
@@ -344,6 +433,9 @@ public class ScalePencilTriangleController : MonoBehaviour
 
     private void Update()
     {
+        if (!isActiveOnCurrentPage)
+            return;
+
         if (mainCamera == null)
             mainCamera = Camera.main;
 

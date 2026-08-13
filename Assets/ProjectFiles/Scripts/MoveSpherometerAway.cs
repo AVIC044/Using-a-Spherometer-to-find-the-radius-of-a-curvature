@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MoveSpherometerAway : MonoBehaviour
 {
@@ -14,10 +15,62 @@ public class MoveSpherometerAway : MonoBehaviour
     [Header("Extra Up Movement")]
     [SerializeField] private float moveUp = 0f;
 
+    [Header("Slide Sync")]
+    [Tooltip("Page indices on which MoveAway() is allowed to run. Leave empty to allow on any page.")]
+    [SerializeField] private List<int> activePageIndices = new List<int>();
+
+    [Tooltip("If true, the spherometer snaps back to its original spot whenever the page changes away from an active index.")]
+    [SerializeField] private bool resetOnPageLeave = true;
+
     private bool hasMoved = false;
+    private bool isActiveOnCurrentPage = true;
+
+    private Vector3 originalPosition;
+    private bool hasOriginalPosition;
+
+    private void Awake()
+    {
+        originalPosition = transform.position;
+        hasOriginalPosition = true;
+    }
+
+    private void OnEnable()
+    {
+        PageNavigationController.OnPageChanged += HandlePageChanged;
+        HandlePageChanged(PageNavigationController.CurrentIndex);
+    }
+
+    private void OnDisable()
+    {
+        PageNavigationController.OnPageChanged -= HandlePageChanged;
+    }
+
+    private void HandlePageChanged(int pageIndex)
+    {
+        isActiveOnCurrentPage = activePageIndices.Count == 0 || activePageIndices.Contains(pageIndex);
+
+        if (!isActiveOnCurrentPage && resetOnPageLeave)
+            ResetSpherometer();
+    }
+
+    private void ResetSpherometer()
+    {
+        StopAllCoroutines();
+
+        if (hasOriginalPosition)
+            transform.position = originalPosition;
+
+        hasMoved = false;
+    }
 
     public void MoveAway()
     {
+        if (!isActiveOnCurrentPage)
+        {
+            Debug.Log($"[MoveSpherometerAway] Ignored: page {PageNavigationController.CurrentIndex} is not an active page for this trigger.");
+            return;
+        }
+
         if (hasMoved)
             return;
 
