@@ -6,17 +6,17 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(Collider))]
 public class DraggableObject : MonoBehaviour
 {
-   [System.Serializable]
+    [System.Serializable]
     public class SnapElement
     {
         public int index; // Page/Step Index
         public bool unlocknavigationOnSnap = true;
 
-        [Header("Standard Highlight (Ignored if Is Spherometer is checked)")]
+        [Header("Standard Highlight (Ignored if a SpherometerTargetProvider is present)")]
         public GameObject highlightObject;
 
         [Header("Spherometer Target Mapping")]
-        [Tooltip("Index from 'Spherometer Targets' array for this step (0 = Table, 1 = Convex Lens, 2 = Glass Plate, etc.).")]
+        [Tooltip("Index into the SpherometerTargetProvider's target list for this step (0 = Table, 1 = Convex Lens, 2 = Glass Plate, etc.). Only used if a SpherometerTargetProvider is attached.")]
         public int targetPointIndex = 0;
 
         public bool restoreToSnapWhenConditionActive = true;
@@ -30,23 +30,11 @@ public class DraggableObject : MonoBehaviour
         [HideInInspector] public Collider highlightCollider;
 
         // ===============================
-        // 🔍 Debugging Only – Do Not Modify
+        // Debugging Only - Do Not Modify
         // ===============================
         [Tooltip("True once snapping is completed. Dragging will be disabled.")]
         public bool snapped;
     }
-
-    [Header("Spherometer Settings")]
-    [Tooltip("Check this if this object is a Spherometer requiring mapped target positioning.")]
-    [SerializeField] private bool isSpherometer = false;
-
-    // ✅ Single Shared Highlight Object for Spherometer Mode
-    [Tooltip("Single shared highlight object used across all spherometer steps.")]
-    [SerializeField] private GameObject spherometerHighlightObject;
-
-    // ✅ Central Master Target Array
-    [Tooltip("Master list of target Transforms in scene (e.g., Index 0: Table, Index 1: Lens, Index 2: Glass Plate).")]
-    [SerializeField] private Transform[] spherometerTargets;
 
     [Header("Snap Elements")]
     [SerializeField] private List<SnapElement> elements = new List<SnapElement>();
@@ -63,6 +51,13 @@ public class DraggableObject : MonoBehaviour
     [Header("Mode")]
     [SerializeField] private bool triggerEventOnly = false;
 
+    [Header("Drag Surface")]
+    [Tooltip("Layer(s) the object should stay glued to the top of while being dragged (e.g. the table). Put your table's collider on a dedicated layer and select only that layer here.")]
+    [SerializeField] private LayerMask dragSurfaceMask = ~0;
+
+    [Tooltip("Small lift above the surface hit point to avoid z-fighting/clipping into the surface mesh.")]
+    [SerializeField] private float dragSurfaceOffset = 0.001f;
+
     [Header("Animator Control")]
     [SerializeField] private Animator animator;
 
@@ -71,9 +66,11 @@ public class DraggableObject : MonoBehaviour
 
     private PageNavigationController pageNavigationController;
 
+    // Optional - present only on objects that need spherometer-style mapped targets.
+    private SpherometerTargetProvider spherometerProvider;
+
     private Camera mainCam;
     private Collider objectCollider;
-    private Collider spherometerHighlightCollider;
 
     private bool isDragging;
     private bool snapping;
@@ -88,12 +85,18 @@ public class DraggableObject : MonoBehaviour
     private Vector3 offset;
     private float objectScreenZ;
 
+    // Offset between this object's pivot and the point on the drag surface
+    // where it was grabbed - recomputed each drag start, applied each frame.
+    private Vector3 surfaceGrabOffset;
+    private bool hasSurfaceGrabOffset;
+
     private Vector3 originalPosition;
     private Quaternion originalRotation;
 
     void Awake()
     {
         pageNavigationController = FindFirstObjectByType<PageNavigationController>();
+        spherometerProvider = GetComponent<SpherometerTargetProvider>();
 
         mainCam = Camera.main;
         if (mainCam == null)
@@ -103,13 +106,6 @@ public class DraggableObject : MonoBehaviour
 
         originalPosition = transform.position;
         originalRotation = transform.rotation;
-
-        // Cache shared Spherometer Highlight Collider
-        if (spherometerHighlightObject != null)
-        {
-            spherometerHighlightCollider = spherometerHighlightObject.GetComponent<Collider>();
-            spherometerHighlightObject.SetActive(false);
-        }
 
         // Cache standard individual Highlight Colliders
         foreach (var element in elements)
@@ -125,16 +121,18 @@ public class DraggableObject : MonoBehaviour
     private void OnEnable()
     {
         PageNavigationController.OnPageChanged += HandlePageChanged;
+
+        // Re-sync every time this object is (re)activated, not just the
+        // very first time. Start() only ever runs once per GameObject
+        // lifetime, so if something disables/enables this object per page
+        // (as "paper" does), relying on Start() alone leaves canDrag stuck
+        // at whatever it was before deactivation.
+        HandlePageChanged(PageNavigationController.CurrentIndex);
     }
 
     private void OnDisable()
     {
         PageNavigationController.OnPageChanged -= HandlePageChanged;
-    }
-
-    private void Start()
-    {
-        HandlePageChanged(PageNavigationController.CurrentIndex);
     }
 
     private void HandlePageChanged(int pageIndex)
@@ -200,8 +198,8 @@ public class DraggableObject : MonoBehaviour
 
         if (element.restoreToSnapWhenConditionActive && element.snapped)
         {
-            Transform t = (isSpherometer && lastSnappedTargetTransform != null) 
-                ? lastSnappedTargetTransform 
+            Transform t = (spherometerProvider != null && lastSnappedTargetTransform != null)
+                ? lastSnappedTargetTransform
                 : targetTransform;
 
             if (t != null)
@@ -227,6 +225,9 @@ public class DraggableObject : MonoBehaviour
             return;
         }
 
+        if (Input.GetMouseButtonDown(0))
+            Debug.Log($"[DraggableObject:{name}] canDrag={canDrag} interactionLocked={interactionLocked}");
+
         if (!canDrag || interactionLocked)
             return;
 
@@ -236,7 +237,11 @@ public class DraggableObject : MonoBehaviour
     void HandleInput()
     {
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            if (Input.GetMouseButtonDown(0))
+                Debug.Log($"[DraggableObject:{name}] blocked - pointer is over a UI GameObject");
             return;
+        }
 
         if (Input.GetMouseButtonDown(0))
             TryStartDrag(Input.mousePosition);
@@ -256,37 +261,71 @@ public class DraggableObject : MonoBehaviour
         if (element.snapped) return;
 
         Ray ray = mainCam.ScreenPointToRay(inputPos);
-        RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit))
+        // Use RaycastAll instead of Raycast: with multiple draggable objects
+        // whose colliders can overlap in screen space, the closest hit isn't
+        // necessarily THIS object's collider. Check every hit along the ray
+        // for our own collider rather than only the nearest one.
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+        bool hitSelf = false;
+        foreach (var h in hits)
         {
-            if (hit.collider == objectCollider)
+            if (h.collider == objectCollider)
             {
-                isDragging = true;
-                OnDragStart?.Invoke();
+                hitSelf = true;
+                break;
+            }
+        }
 
-                if (animator != null && animator.enabled)
-                    animator.enabled = false;
+        Debug.Log($"[DraggableObject:{name}] raycast hit {hits.Length} collider(s), self hit={hitSelf}");
 
-                objectScreenZ = mainCam.WorldToScreenPoint(transform.position).z;
-                offset = transform.position - GetWorldPosition(inputPos);
+        if (hitSelf)
+        {
+            isDragging = true;
+            OnDragStart?.Invoke();
 
-                GameObject activeHighlight = GetActiveHighlightObject(element);
-                Transform targetTransform = GetActiveTargetTransform(element);
+            if (animator != null && animator.enabled)
+                animator.enabled = false;
 
-                if (activeHighlight != null && targetTransform != null)
-                {
-                    activeHighlight.transform.position = targetTransform.position;
-                    activeHighlight.transform.rotation = targetTransform.rotation;
-                    activeHighlight.SetActive(true);
-                }
+            objectScreenZ = mainCam.WorldToScreenPoint(transform.position).z;
+            offset = transform.position - GetWorldPosition(inputPos);
+
+            // Also record the offset relative to the drag surface (e.g. the
+            // table), if the grab ray hits it. Drag() uses this every frame
+            // so the object rides the surface's actual height instead of a
+            // camera-facing plane at a fixed depth, which is what let it
+            // sink below the table as you dragged.
+            hasSurfaceGrabOffset = Physics.Raycast(ray, out RaycastHit surfaceHit, Mathf.Infinity, dragSurfaceMask);
+            if (hasSurfaceGrabOffset)
+                surfaceGrabOffset = transform.position - surfaceHit.point;
+
+            GameObject activeHighlight = GetActiveHighlightObject(element);
+            Transform targetTransform = GetActiveTargetTransform(element);
+
+            if (activeHighlight != null && targetTransform != null)
+            {
+                activeHighlight.transform.position = targetTransform.position;
+                activeHighlight.transform.rotation = targetTransform.rotation;
+                activeHighlight.SetActive(true);
             }
         }
     }
 
     void Drag(Vector3 inputPos)
     {
-        transform.position = GetWorldPosition(inputPos) + offset;
+        Ray ray = mainCam.ScreenPointToRay(inputPos);
+
+        if (hasSurfaceGrabOffset && Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, dragSurfaceMask))
+        {
+            transform.position = hit.point + surfaceGrabOffset + hit.normal * dragSurfaceOffset;
+        }
+        else
+        {
+            // Fallback: no drag surface hit (e.g. dragged past the table's
+            // edge, or dragSurfaceMask isn't set up). Keeps dragging usable
+            // instead of freezing, at the cost of the old sinking behavior.
+            transform.position = GetWorldPosition(inputPos) + offset;
+        }
     }
 
     void Release()
@@ -444,37 +483,29 @@ public class DraggableObject : MonoBehaviour
     }
 
     // ==========================================
-    // 🛠️ HELPER METHODS (Spherometer Fallbacks)
+    // HELPER METHODS - delegate to SpherometerTargetProvider when present
     // ==========================================
 
     private GameObject GetActiveHighlightObject(SnapElement element)
     {
-        if (isSpherometer && spherometerHighlightObject != null)
-            return spherometerHighlightObject;
+        if (spherometerProvider != null && spherometerProvider.HighlightObject != null)
+            return spherometerProvider.HighlightObject;
 
         return element.highlightObject;
     }
 
     private Collider GetActiveHighlightCollider(SnapElement element)
     {
-        if (isSpherometer && spherometerHighlightCollider != null)
-            return spherometerHighlightCollider;
+        if (spherometerProvider != null && spherometerProvider.HighlightCollider != null)
+            return spherometerProvider.HighlightCollider;
 
         return element.highlightCollider;
     }
 
     private Transform GetActiveTargetTransform(SnapElement element)
     {
-        if (isSpherometer && spherometerTargets != null && spherometerTargets.Length > 0)
-        {
-            if (element.targetPointIndex >= 0 && element.targetPointIndex < spherometerTargets.Length)
-            {
-                return spherometerTargets[element.targetPointIndex];
-            }
-
-            Debug.LogWarning($"[DraggableObject] Index {element.targetPointIndex} out of bounds for spherometerTargets.");
-            return null;
-        }
+        if (spherometerProvider != null)
+            return spherometerProvider.GetTargetTransform(element.targetPointIndex);
 
         return element.highlightObject != null ? element.highlightObject.transform : null;
     }

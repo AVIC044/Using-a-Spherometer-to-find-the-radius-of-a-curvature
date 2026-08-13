@@ -37,12 +37,6 @@ public class MultiStepDialerController : MonoBehaviour
         public Button autoFillButton;
     }
 
-    // [Header("Keypad / Calculator Buttons")]
-    // [Tooltip("Assign numeric buttons (0-9). The script will automatically assign click listeners based on button text or index.")]
-    // public Button[] digitButtons;
-    // public Button decimalButton;
-    // public Button backspaceButton;
-
     [Header("Mapped Configurations")]
     [SerializeField] private List<DialerPageConfig> pageConfigs = new List<DialerPageConfig>();
 
@@ -63,11 +57,6 @@ public class MultiStepDialerController : MonoBehaviour
     private int wrongAttempts;
     private bool solved;
 
-    // private void Start()
-    // {
-    //     SetupKeypadListeners();
-    // }
-
     private void OnEnable()
     {
         PageNavigationController.OnPageChanged += HandlePageChanged;
@@ -77,40 +66,6 @@ public class MultiStepDialerController : MonoBehaviour
     {
         PageNavigationController.OnPageChanged -= HandlePageChanged;
     }
-
-    /// <summary>
-    /// Dynamically binds click listeners to calculator buttons in code.
-    /// </summary>
-    // private void SetupKeypadListeners()
-    // {
-    //     // Setup digit buttons (0-9)
-    //     for (int i = 0; i < digitButtons.Length; i++)
-    //     {
-    //         if (digitButtons[i] != null)
-    //         {
-    //             // Try reading text from button label, otherwise fall back to array index string
-    //             TMP_Text btnText = digitButtons[i].GetComponentInChildren<TMP_Text>();
-    //             string digitValue = (btnText != null && !string.IsNullOrEmpty(btnText.text)) ? btnText.text.Trim() : i.ToString();
-
-    //             digitButtons[i].onClick.RemoveAllListeners();
-    //             digitButtons[i].onClick.AddListener(() => OnDigitPressed(digitValue));
-    //         }
-    //     }
-
-    //     // Setup decimal button
-    //     if (decimalButton != null)
-    //     {
-    //         decimalButton.onClick.RemoveAllListeners();
-    //         decimalButton.onClick.AddListener(OnDecimalPressed);
-    //     }
-
-    //     // Setup backspace button
-    //     if (backspaceButton != null)
-    //     {
-    //         backspaceButton.onClick.RemoveAllListeners();
-    //         backspaceButton.onClick.AddListener(OnBackspacePressed);
-    //     }
-    // }
 
     private void HandlePageChanged(int pageIndex)
     {
@@ -145,16 +100,19 @@ public class MultiStepDialerController : MonoBehaviour
 
         for (int i = 0; i < activeConfig.fields.Length; i++)
         {
+            bool isActiveStep = (i == 0);
+
             if (activeConfig.fields[i] != null)
             {
-                activeConfig.fields[i].gameObject.SetActive(true);
+                // Only activate and make interactable the first field initially
+                activeConfig.fields[i].gameObject.SetActive(isActiveStep);
                 activeConfig.fields[i].text = "";
-                activeConfig.fields[i].interactable = (i == 0);
+                activeConfig.fields[i].interactable = isActiveStep;
             }
 
-            // Make sure question texts are active on initial setup
+            // Only show the first question text initially
             if (i < activeConfig.questionTexts.Length && activeConfig.questionTexts[i] != null)
-                activeConfig.questionTexts[i].gameObject.SetActive(true);
+                activeConfig.questionTexts[i].gameObject.SetActive(isActiveStep);
 
             if (i < activeConfig.answerTexts.Length && activeConfig.answerTexts[i] != null)
                 activeConfig.answerTexts[i].gameObject.SetActive(false);
@@ -235,7 +193,7 @@ public class MultiStepDialerController : MonoBehaviour
         if (!float.TryParse(current.text, out float value))
             return;
 
-        // Check if the answer is wrong
+        // Check if the answer is wrong for the current active field index only
         if (Mathf.Abs(value - activeConfig.answers[activeFieldIndex]) > tolerance)
         {
             wrongAttempts++;
@@ -251,7 +209,7 @@ public class MultiStepDialerController : MonoBehaviour
             return;
         }
 
-        // If correct, complete field
+        // If correct, complete field sequentially
         CompleteCurrentField();
     }
 
@@ -271,26 +229,22 @@ public class MultiStepDialerController : MonoBehaviour
     {
         TMP_InputField current = activeConfig.fields[activeFieldIndex];
 
-        // 1. Hide the input field
+        // 1. Hide the current input field
         if (current != null)
         {
             current.interactable = false;
             current.gameObject.SetActive(false);
         }
 
-        // 2. Hide question text if enabled for this slide
-        if (activeConfig.hideQuestionTextsOnCompletion)
+        // 2. Hide question text if enabled for this slide or sequential view
+        if (activeFieldIndex < activeConfig.questionTexts.Length && activeConfig.questionTexts[activeFieldIndex] != null)
         {
-            if (activeFieldIndex < activeConfig.questionTexts.Length && activeConfig.questionTexts[activeFieldIndex] != null)
-            {
-                activeConfig.questionTexts[activeFieldIndex].gameObject.SetActive(false);
-            }
+            activeConfig.questionTexts[activeFieldIndex].gameObject.SetActive(false);
         }
 
         // 3. Display the answer text
         if (activeFieldIndex < activeConfig.answerTexts.Length && activeConfig.answerTexts[activeFieldIndex] != null)
         {
-            // activeConfig.answerTexts[activeFieldIndex].text = current != null ? current.text : activeConfig.answers[activeFieldIndex].ToString();
             activeConfig.answerTexts[activeFieldIndex].gameObject.SetActive(true);
         }
 
@@ -309,7 +263,7 @@ public class MultiStepDialerController : MonoBehaviour
 
         activeFieldIndex++;
 
-        // Enable next field or complete slide
+        // Enable next field strictly one at a time or complete slide
         if (activeFieldIndex < activeConfig.fields.Length)
         {
             if (activeConfig.fields[activeFieldIndex] != null)
@@ -318,6 +272,11 @@ public class MultiStepDialerController : MonoBehaviour
                 activeConfig.fields[activeFieldIndex].interactable = true;
                 activeConfig.fields[activeFieldIndex].Select();
                 activeConfig.fields[activeFieldIndex].ActivateInputField();
+            }
+
+            if (activeFieldIndex < activeConfig.questionTexts.Length && activeConfig.questionTexts[activeFieldIndex] != null)
+            {
+                activeConfig.questionTexts[activeFieldIndex].gameObject.SetActive(true);
             }
         }
         else
@@ -343,6 +302,7 @@ public class MultiStepDialerController : MonoBehaviour
                 f.interactable = false;
         }
 
+        OnAllAnswersVerified?.Invoke();
         OnRequestNavigationUnlock?.Invoke();
     }
 }

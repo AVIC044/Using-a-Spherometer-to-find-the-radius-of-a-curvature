@@ -1,32 +1,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+
 public class ComvexLensGapController : MonoBehaviour
 {
-   [System.Serializable]
+    public enum PaperGapResult
+    {
+        PassThrough,
+        Blocked
+    }
+
+    [System.Serializable]
     public class LensSlideData
     {
-        [Tooltip("The page index where this interaction is active.")]
+        [Header("Page Info")]
+        [Tooltip("The page index where this paper-gap sequence is active.")]
         public int pageIndex;
 
-        [Tooltip("The specific convex lenses selectable on this slide.")]
-        public List<GameObject> selectableLenses = new();
+        [Header("Paper Position")]
+        [Tooltip("The FilterPaper parent/anchor that is repositioned before the paper animation starts.")]
+        public Transform paperParent;
 
-        [Header("Paper Position Mapping (Optional for this slide)")]
-        [Tooltip("Reference to the paper Transform.")]
-        public Transform paperObject;
-        [Tooltip("Where the paper sits initially.")]
-        public Transform paperStartTransform;
-        [Tooltip("Where the paper sits when placed under the screw.")]
-        public Transform paperUnderScrewTransform;
-        [Tooltip("Where the paper stops when blocked by the screw.")]
-        public Transform paperBlockedTransform;
+        [Tooltip("Where the FilterPaper parent/anchor should be placed for the gap test.")]
+        public Transform paperTestPosition;
 
-        [Tooltip("The target transform representing the 'gap' for this slide.")]
-        public Transform gapTarget;
+        [Header("Paper Gap Sequence")]
+        [Tooltip("Result of the first paper test, before the spherometer is adjusted.")]
+        public PaperGapResult firstPaperGapResult = PaperGapResult.PassThrough;
 
-        [Tooltip("Distance threshold required to pass the gap check.")]
-        public float gapThreshold = 0.05f;
+        [Tooltip("Result of the second paper test, after the spherometer adjustment.")]
+        public PaperGapResult secondPaperGapResult = PaperGapResult.Blocked;
 
         [Header("Slide Events")]
         public UnityEvent OnSlideCheckPassed;
@@ -35,89 +38,219 @@ public class ComvexLensGapController : MonoBehaviour
     [Header("Slide Configurations")]
     [SerializeField] private List<LensSlideData> slideDataList = new();
 
-    [Header("Events")]
-    [Tooltip("Invoked when the selected lens successfully passes the gap check.")]
+    [Header("Paper Animation")]
+    [Tooltip("Animator on the FilterPaper parent. The animated Paper child is controlled by this Animator.")]
+    [SerializeField] private Animator paperAnimator;
+
+    [Tooltip("Trigger that plays the paper PassThrough animation.")]
+    [SerializeField] private string passThroughTrigger = "PassThrough";
+
+    [Tooltip("Trigger that plays the paper Blocked animation.")]
+    [SerializeField] private string blockedTrigger = "Blocked";
+
+    [Header("Paper Click Interaction")]
+    [Tooltip("Collider used to detect a click on the paper. Usually a BoxCollider on the FilterPaper parent.")]
+    [SerializeField] private Collider paperInteractionCollider;
+
+    [Tooltip("Camera used for paper clicks. If empty, Camera.main is used automatically.")]
+    [SerializeField] private Camera mainCamera;
+
+    [Header("Global Events")]
+    [Tooltip("Invoked after the second paper test has completed.")]
     public UnityEvent OnFinalGapCheckPassed;
 
-    private int currentPageIndex = 0;
+    private int currentPageIndex;
+    private int paperTestCount;
+    private bool secondPaperTestUnlocked;
 
     private void OnEnable()
     {
-        // Listen to the navigation event[cite: 3]
         PageNavigationController.OnPageChanged += HandlePageChanged;
     }
 
     private void OnDisable()
     {
-        // Listen to the navigation event[cite: 3]
         PageNavigationController.OnPageChanged -= HandlePageChanged;
+    }
+
+    private void Start()
+    {
+        if (mainCamera == null)
+            mainCamera = Camera.main;
+
+        if (mainCamera == null)
+            mainCamera = FindFirstObjectByType<Camera>();
+
+        HandlePageChanged(PageNavigationController.CurrentIndex);
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+            TryHandlePaperClick(Input.mousePosition);
     }
 
     private void HandlePageChanged(int pageIndex)
     {
         currentPageIndex = pageIndex;
-    }
+        paperTestCount = 0;
+        secondPaperTestUnlocked = false;
 
-    /// <summary>
-    /// Call this via UI buttons or click events to move the paper to a specific target position.
-    /// positionType: 0 = Start, 1 = Under Screw, 2 = Blocked
-    /// </summary>
-    public void MovePaper(int positionType)
-    {
-        LensSlideData currentData = slideDataList.Find(x => x.pageIndex == currentPageIndex);
-        if (currentData == null || currentData.paperObject == null) return;
+        LensSlideData data = GetCurrentSlideData();
 
-        Transform target = null;
-        if (positionType == 0) target = currentData.paperStartTransform;
-        else if (positionType == 1) target = currentData.paperUnderScrewTransform;
-        else if (positionType == 2) target = currentData.paperBlockedTransform;
-
-        if (target != null)
+        if (data == null)
         {
-            currentData.paperObject.position = target.position;
-            currentData.paperObject.rotation = target.rotation;
-        }
-    }
-
-    /// <summary>
-    /// Call this from your interaction script (e.g., OnMouseUp or OnDrop) passing the dragged lens.
-    /// </summary>
-    public void CheckLensGap(GameObject selectedLens)
-    {
-        LensSlideData currentData = slideDataList.Find(x => x.pageIndex == currentPageIndex);
-
-        if (currentData == null) return;
-
-        // Verify the object is allowed to be selected on this specific slide index
-        if (!currentData.selectableLenses.Contains(selectedLens))
-        {
-            Debug.LogWarning($"[ConvexLens] {selectedLens.name} is not a valid selection for page {currentPageIndex}.");
+            Debug.Log($"[ConvexLens] Page {pageIndex}: no paper-gap sequence configured.");
             return;
         }
 
-        if (currentData.gapTarget == null) return;
+        Debug.Log($"[ConvexLens] Page {pageIndex}: sequence ready. First = {data.firstPaperGapResult}, Second = {data.secondPaperGapResult}.");
+    }
 
-        // Perform the final gap check
-        float distance = Vector3.Distance(selectedLens.transform.position, currentData.gapTarget.position);
-        
-        if (distance <= currentData.gapThreshold)
+    private LensSlideData GetCurrentSlideData()
+    {
+        return slideDataList.Find(x => x.pageIndex == currentPageIndex);
+    }
+
+    private void TryHandlePaperClick(Vector3 screenPosition)
+    {
+        if (paperInteractionCollider == null)
+            return;
+
+        if (mainCamera == null)
         {
-            // Optional: Snap perfectly into the gap
-            selectedLens.transform.position = currentData.gapTarget.position;
-            selectedLens.transform.rotation = currentData.gapTarget.rotation;
+            Debug.LogWarning("[ConvexLens] Paper click ignored: no camera is available.");
+            return;
+        }
 
-            // Fire the events
-            currentData.OnSlideCheckPassed?.Invoke();
-            OnFinalGapCheckPassed?.Invoke();
+        Ray ray = mainCamera.ScreenPointToRay(screenPosition);
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider != paperInteractionCollider)
+                continue;
+
+            Debug.Log($"[ConvexLens] Paper clicked: {hit.collider.name}.");
+            OnPaperClicked();
+            return;
         }
     }
 
+    public void OnPaperClicked()
+    {
+        LensSlideData data = GetCurrentSlideData();
+
+        if (data == null)
+        {
+            Debug.LogWarning($"[ConvexLens] Paper click ignored on page {currentPageIndex}: no sequence configured.");
+            return;
+        }
+
+        if (paperTestCount >= 2)
+        {
+            Debug.Log($"[ConvexLens] Page {currentPageIndex}: both paper tests are already complete.");
+            return;
+        }
+
+        if (paperTestCount == 1 && !secondPaperTestUnlocked)
+        {
+            Debug.Log($"[ConvexLens] Page {currentPageIndex}: second paper test is locked until the spherometer adjustment is complete.");
+            return;
+        }
+
+        if (data.paperParent == null)
+        {
+            Debug.LogWarning($"[ConvexLens] Page {currentPageIndex}: Paper Parent is not assigned.");
+            return;
+        }
+
+        if (data.paperTestPosition == null)
+        {
+            Debug.LogWarning($"[ConvexLens] Page {currentPageIndex}: Paper Test Position is not assigned.");
+            return;
+        }
+
+        data.paperParent.position = data.paperTestPosition.position;
+        data.paperParent.rotation = data.paperTestPosition.rotation;
+
+        PaperGapResult result = paperTestCount == 0
+            ? data.firstPaperGapResult
+            : data.secondPaperGapResult;
+
+        Debug.Log($"[ConvexLens] Page {currentPageIndex}: starting paper test #{paperTestCount + 1} -> {result}.");
+
+        paperTestCount++;
+        PlayPaperAnimation(result);
+
+        if (paperTestCount == 1)
+        {
+            Debug.Log($"[ConvexLens] Page {currentPageIndex}: first test complete. Waiting for spherometer adjustment.");
+        }
+        else
+        {
+            Debug.Log($"[ConvexLens] Page {currentPageIndex}: second test complete. Sequence finished.");
+            data.OnSlideCheckPassed?.Invoke();
+            OnFinalGapCheckPassed?.Invoke();
+            Debug.Log($"[ConvexLens] Page {currentPageIndex}: completion events invoked.");
+        }
+    }
+
+    private void PlayPaperAnimation(PaperGapResult result)
+    {
+        if (paperAnimator == null)
+        {
+            Debug.LogWarning("[ConvexLens] Cannot play paper animation: Paper Animator is not assigned.");
+            return;
+        }
+
+        switch (result)
+        {
+            case PaperGapResult.PassThrough:
+                ResetSequenceTriggers();
+                paperAnimator.SetTrigger(passThroughTrigger);
+                Debug.Log($"[ConvexLens] Paper animation triggered: PassThrough ({passThroughTrigger}).");
+                break;
+
+            case PaperGapResult.Blocked:
+                ResetSequenceTriggers();
+                paperAnimator.SetTrigger(blockedTrigger);
+                Debug.Log($"[ConvexLens] Paper animation triggered: Blocked ({blockedTrigger}).");
+                break;
+        }
+    }
+
+    private void ResetSequenceTriggers()
+    {
+        if (!string.IsNullOrEmpty(passThroughTrigger))
+            paperAnimator.ResetTrigger(passThroughTrigger);
+
+        if (!string.IsNullOrEmpty(blockedTrigger))
+            paperAnimator.ResetTrigger(blockedTrigger);
+    }
+
     /// <summary>
-    /// Helper method to bind in the Inspector's OnFinalGapCheckPassed event.
+    /// Called by SpherometerStepController.OnFinalSequenceCompleted after the screw adjustment.
+    /// This unlocks the second paper test on the same page.
+    /// </summary>
+    public void AllowSecondPaperTest()
+    {
+        if (paperTestCount != 1)
+        {
+            Debug.LogWarning($"[ConvexLens] Cannot unlock second paper test on page {currentPageIndex}: expected exactly one completed paper test, current count = {paperTestCount}.");
+            return;
+        }
+
+        secondPaperTestUnlocked = true;
+        Debug.Log($"[ConvexLens] Page {currentPageIndex}: second paper test unlocked after spherometer adjustment.");
+    }
+
+    /// <summary>
+    /// Optional Inspector event target for unlocking page navigation after this sequence.
     /// </summary>
     public void UnlockPageNavigation()
     {
-        // Calls the static unlock method from your manager[cite: 3]
+        Debug.Log($"[ConvexLens] Page {currentPageIndex}: requesting navigation unlock.");
         PageNavigationController.RequestNavigationUnlock();
     }
 }

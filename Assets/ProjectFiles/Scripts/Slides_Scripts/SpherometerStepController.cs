@@ -54,9 +54,31 @@ public class SpherometerStepController : MonoBehaviour
     [Header("Global Events")]
     public UnityEvent OnFinalSequenceCompleted;
 
+    [Header("Interaction")]
+    [Tooltip("Collider(s) that count as 'clicking the spherometer' to trigger the next rotation step. Leave empty to automatically use every collider found in this object and its children, so clicking anywhere on the whole model works - not just one small handle mesh.")]
+    [SerializeField] private Collider[] interactionColliders;
+
+    [Header("Step Highlight")]
+    [Tooltip("Highlight shown on the clickable screw/handle while the current step is waiting for input.")]
+    [SerializeField] private GameObject stepHighlight;
+
     private int currentPageIndex = 0;
     private int currentRotationCount = 0;
     private bool isAnimating = false;
+
+    private Camera mainCam;
+
+    private void Awake()
+    {
+        mainCam = Camera.main;
+        if (mainCam == null)
+            mainCam = FindFirstObjectByType<Camera>();
+
+        if (interactionColliders == null || interactionColliders.Length == 0)
+            interactionColliders = GetComponentsInChildren<Collider>(true);
+
+        SetStepHighlight(false);
+    }
 
     private void OnEnable()
     {
@@ -65,7 +87,7 @@ public class SpherometerStepController : MonoBehaviour
 
     private void OnDisable()
     {
-        PageNavigationController.OnPageChanged -= HandlePageChanged; 
+        PageNavigationController.OnPageChanged -= HandlePageChanged;
     }
 
     private void Start()
@@ -78,6 +100,45 @@ public class SpherometerStepController : MonoBehaviour
         HandlePageChanged(PageNavigationController.CurrentIndex);
     }
 
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+            TryHandleClick(Input.mousePosition);
+    }
+
+    /// <summary>
+    /// Replaces Unity's built-in OnMouseDown(), which only fires for the
+    /// single CLOSEST collider hit by the click - if some other collider
+    /// (the spherometer's own drag collider, the table, another prop)
+    /// happens to be nearer to the camera at that pixel, OnMouseDown would
+    /// silently never fire at all. This instead checks every collider hit
+    /// along the ray against the full set of colliders that belong to this
+    /// spherometer, so any click landing anywhere on the model registers.
+    /// </summary>
+    private void TryHandleClick(Vector3 screenPos)
+    {
+        if (mainCam == null || interactionColliders == null || interactionColliders.Length == 0)
+            return;
+
+        Ray ray = mainCam.ScreenPointToRay(screenPos);
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+
+        foreach (var hit in hits)
+        {
+            foreach (var col in interactionColliders)
+            {
+                if (col != null && hit.collider == col)
+                {
+                    // The player has interacted with the current step, so
+                    // remove the prompt highlight before starting the motion.
+                    SetStepHighlight(false);
+                    TriggerNextRotation();
+                    return;
+                }
+            }
+        }
+    }
+
     private void HandlePageChanged(int pageIndex)
     {
         currentPageIndex = pageIndex;
@@ -88,11 +149,10 @@ public class SpherometerStepController : MonoBehaviour
         {
             _countText.gameObject.SetActive(false);
         }
-    }
 
-    private void OnMouseDown()
-    {
-        TriggerNextRotation();
+        // A new page starts a new spherometer sequence. Show the highlight
+        // only when there is actually a configured step waiting for input.
+        SetStepHighlight(HasStepWaitingForInput());
     }
 
     public void TriggerNextRotation()
@@ -182,9 +242,35 @@ public class SpherometerStepController : MonoBehaviour
         SpherometerSlideData currentData = GetCurrentSlideData();
         if (currentData != null && currentRotationCount >= currentData.maxRotationsCount)
         {
+            // Final step: there is no more interaction to prompt.
+            SetStepHighlight(false);
             currentData.OnSlideCheckPassed?.Invoke();
             OnFinalSequenceCompleted?.Invoke();
         }
+        else
+        {
+            // Another step is waiting, so show the highlight again.
+            SetStepHighlight(HasStepWaitingForInput());
+        }
+    }
+
+    private bool HasStepWaitingForInput()
+    {
+        SpherometerSlideData currentData = GetCurrentSlideData();
+
+        if (currentData == null || currentRotationCount >= currentData.maxRotationsCount)
+            return false;
+
+        // Only show the highlight when the current rotation index has a
+        // configured step mapping. This keeps the prompt synchronized with
+        // the step sequence rather than merely the page.
+        return currentData.stepMappings.Exists(x => x != null && x.stepIndex == currentRotationCount);
+    }
+
+    private void SetStepHighlight(bool active)
+    {
+        if (stepHighlight != null)
+            stepHighlight.SetActive(active);
     }
 
     public void UnlockPageNavigation()
