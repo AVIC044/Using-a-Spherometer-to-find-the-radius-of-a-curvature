@@ -14,7 +14,7 @@ public class SpherometerController : MonoBehaviour
     [SerializeField] private float highlightFadeDuration = 0.4f; // how long each highlight takes to fade in
 
     [Header("Camera FOV Settings")]
-    [SerializeField] private Camera _cam;
+    private Camera _cam;
     [SerializeField] private float _defaultCamFOV = 60f; // FOV used for other slides
     [SerializeField] private float _slide2FOV = 15f;     // FOV specifically for Slide 2
     [SerializeField] private int _slide2PageIndex = 1;   // 0-based page index (Slide 2 = Index 1)
@@ -71,7 +71,7 @@ public class SpherometerController : MonoBehaviour
             else
             {
                 _cam.fieldOfView = _defaultCamFOV;
-                _cam = Camera.main; // Reset to main camera for other slides
+                // _cam = Camera.main; // Reset to main camera for other slides
             }
         }
     }

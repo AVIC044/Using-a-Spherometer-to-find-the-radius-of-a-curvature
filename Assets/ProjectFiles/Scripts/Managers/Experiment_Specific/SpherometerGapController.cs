@@ -26,7 +26,9 @@ public class SpherometerGapController : MonoBehaviour
     {
         Start,          // Initial resting position
         TestPosition,   // Where paper is placed for gap test
-        Blocked         // Where paper ends up when blocked
+        PassThroughEnd, // Where paper ends up when the gap test passes through (e.g. Filter_paper_Gap)
+        BlockedEnd,     // Where paper ends up when blocked (e.g. Filter_paper_No_Gap)
+        Blocked         // Legacy alias for the old blockedPosition field
     }
 
     [System.Serializable]
@@ -47,10 +49,16 @@ public class SpherometerGapController : MonoBehaviour
         [Tooltip("Where the paper starts before any test.")]
         public Transform startPosition;
 
-        [Tooltip("Where the paper is placed for the gap test.")]
+        [Tooltip("Where the paper is placed for the gap test (starting point of the test, before the result is known).")]
         public Transform testPosition;
 
-        [Tooltip("Where the paper ends up when blocked (optional fallback).")]
+        [Tooltip("Where the paper (FilterPaper) ends up when the test result is PassThrough — e.g. Filter_paper_Gap.")]
+        public Transform passThroughEndPosition;
+
+        [Tooltip("Where the paper (FilterPaper) ends up when the test result is Blocked — e.g. Filter_paper_No_Gap.")]
+        public Transform blockedEndPosition;
+
+        [Tooltip("Legacy fallback position, used only if passThroughEndPosition/blockedEndPosition are not assigned.")]
         public Transform blockedPosition;
 
         [Header("Test Sequence")]
@@ -88,6 +96,9 @@ public class SpherometerGapController : MonoBehaviour
 
     [Tooltip("Trigger name for Blocked animation.")]
     [SerializeField] private string blockedTrigger = "Blocked";
+
+    [Tooltip("Name of the Animator state the paper animation returns to on reset (e.g. Default_State).")]
+    [SerializeField] private string defaultStateName = "Default_State";
 
     [Header("Interaction")]
     [Tooltip("Collider used to detect clicks on the paper.")]
@@ -205,7 +216,18 @@ public class SpherometerGapController : MonoBehaviour
             return;
 
         currentConfig.paperObject.position = currentConfig.startPosition.position;
-        currentConfig.paperObject.rotation = currentConfig.startPosition.rotation;
+        // currentConfig.paperObject.rotation = currentConfig.startPosition.rotation;
+
+        // The Animator only drives the child "Paper" object's local transform.
+        // Snapping the parent above does nothing to that child, so without this
+        // the child can be left visually wherever the last PassThrough/Blocked
+        // clip ended. Force it back to the bind pose in the same frame.
+        if (paperAnimator != null && !string.IsNullOrEmpty(defaultStateName))
+        {
+            ResetAllTriggers();
+            paperAnimator.Play(defaultStateName, 0, 0f);
+            paperAnimator.Update(0f);
+        }
     }
 
     #endregion
@@ -225,14 +247,20 @@ public class SpherometerGapController : MonoBehaviour
 
         Ray ray = interactionCamera.ScreenPointToRay(screenPosition);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
-        {
-            if (hit.collider != paperClickCollider)
-                return;
+        RaycastHit[] hits = Physics.RaycastAll(ray, Mathf.Infinity);
 
-            // After the first paper test, the next paper click removes the paper,
-            // matching the demonstration flow. The second test remains locked
-            // until the SpherometerStepController calls UnlockSecondTest().
+        bool hitPaper = false;
+        foreach (var h in hits)
+        {
+            if (h.collider == paperClickCollider)
+            {
+                hitPaper = true;
+                break;
+            }
+        }
+
+        if (hitPaper)
+        {
             if (waitingForPaperRemoval)
             {
                 RemovePaperAfterFirstTest();
@@ -310,6 +338,15 @@ public class SpherometerGapController : MonoBehaviour
         PaperTestResult result = DetermineTestResult(config);
         Debug.Log($"[SpherometerGap] Test #{testCount}: {result}");
 
+        // Snap FilterPaper's own transform to the correct end target for this
+        // result BEFORE the animation plays. The animator clip only animates
+        // the child "Paper" object's local transform - it does not move the
+        // parent - so the parent has to be placed here to match the outcome
+        // (Filter_paper_Gap for PassThrough, Filter_paper_No_Gap for Blocked).
+        Transform endTarget = GetEndPositionForResult(config, result);
+        if (endTarget != null)
+            PositionPaper(config.paperObject, endTarget);
+
         // Play animation and wait
         if (paperAnimator != null)
         {
@@ -317,8 +354,8 @@ public class SpherometerGapController : MonoBehaviour
         }
         else
         {
-            // Fallback positioning
-            if (result == PaperTestResult.Blocked && config.blockedPosition != null)
+            // Fallback positioning (only relevant if no animator is assigned)
+            if (endTarget == null && result == PaperTestResult.Blocked && config.blockedPosition != null)
                 PositionPaper(config.paperObject, config.blockedPosition);
 
             yield return new WaitForSeconds(0.5f);
@@ -340,6 +377,20 @@ public class SpherometerGapController : MonoBehaviour
 
         // Preset result based on test count
         return testCount == 1 ? config.firstTestResult : config.secondTestResult;
+    }
+
+    /// <summary>
+    /// Maps a test result to the Transform that FilterPaper should be snapped
+    /// to for that outcome (Filter_paper_Gap for PassThrough, Filter_paper_No_Gap
+    /// for Blocked). Falls back to the legacy blockedPosition if the new fields
+    /// aren't assigned, and returns null if nothing is set (no repositioning).
+    /// </summary>
+    private Transform GetEndPositionForResult(SlideConfiguration config, PaperTestResult result)
+    {
+        if (result == PaperTestResult.PassThrough)
+            return config.passThroughEndPosition;
+
+        return config.blockedEndPosition != null ? config.blockedEndPosition : config.blockedPosition;
     }
 
     private IEnumerator PlayAnimationAndWait(PaperTestResult result)
@@ -415,7 +466,7 @@ public class SpherometerGapController : MonoBehaviour
     {
         if (paper == null || target == null) return;
         paper.position = target.position;
-        paper.rotation = target.rotation;
+        // paper.rotation = target.rotation;
     }
 
     /// <summary>
@@ -430,6 +481,8 @@ public class SpherometerGapController : MonoBehaviour
         {
             PaperPosition.Start => config.startPosition,
             PaperPosition.TestPosition => config.testPosition,
+            PaperPosition.PassThroughEnd => config.passThroughEndPosition,
+            PaperPosition.BlockedEnd => config.blockedEndPosition != null ? config.blockedEndPosition : config.blockedPosition,
             PaperPosition.Blocked => config.blockedPosition,
             _ => null
         };

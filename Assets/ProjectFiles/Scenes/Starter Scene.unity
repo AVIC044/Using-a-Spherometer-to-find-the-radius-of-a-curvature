@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: 6d4404e6e8152d24d8589d9054641098, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 675fcadcd36833f42b347d576318bf02, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -541,8 +541,10 @@ MonoBehaviour:
     surfaceType: 0
     paperObject: {fileID: 4452946155681086439}
     startPosition: {fileID: 1855713999}
-    testPosition: {fileID: 398509236}
-    blockedPosition: {fileID: 443157135}
+    testPosition: {fileID: 1855713999}
+    passThroughEndPosition: {fileID: 27077008}
+    blockedEndPosition: {fileID: 1837901202}
+    blockedPosition: {fileID: 0}
     firstTestResult: 0
     secondTestResult: 1
     requiresSpherometerAdjustment: 1
@@ -573,8 +575,10 @@ MonoBehaviour:
     surfaceType: 2
     paperObject: {fileID: 4452946155681086439}
     startPosition: {fileID: 1855713999}
-    testPosition: {fileID: 398509236}
-    blockedPosition: {fileID: 443157135}
+    testPosition: {fileID: 1855713999}
+    passThroughEndPosition: {fileID: 398509236}
+    blockedEndPosition: {fileID: 443157135}
+    blockedPosition: {fileID: 0}
     firstTestResult: 0
     secondTestResult: 1
     requiresSpherometerAdjustment: 1
@@ -606,7 +610,9 @@ MonoBehaviour:
     paperObject: {fileID: 4452946155681086439}
     startPosition: {fileID: 1855713999}
     testPosition: {fileID: 27077008}
-    blockedPosition: {fileID: 1837901202}
+    passThroughEndPosition: {fileID: 27077008}
+    blockedEndPosition: {fileID: 1837901202}
+    blockedPosition: {fileID: 0}
     firstTestResult: 0
     secondTestResult: 1
     requiresSpherometerAdjustment: 1
@@ -638,7 +644,9 @@ MonoBehaviour:
     paperObject: {fileID: 4452946155681086439}
     startPosition: {fileID: 1855713999}
     testPosition: {fileID: 398509236}
-    blockedPosition: {fileID: 443157135}
+    passThroughEndPosition: {fileID: 398509236}
+    blockedEndPosition: {fileID: 1837901202}
+    blockedPosition: {fileID: 0}
     firstTestResult: 0
     secondTestResult: 1
     requiresSpherometerAdjustment: 1
@@ -670,7 +678,9 @@ MonoBehaviour:
     paperObject: {fileID: 4452946155681086439}
     startPosition: {fileID: 1855713999}
     testPosition: {fileID: 27077008}
-    blockedPosition: {fileID: 1837901202}
+    passThroughEndPosition: {fileID: 27077008}
+    blockedEndPosition: {fileID: 1837901202}
+    blockedPosition: {fileID: 0}
     firstTestResult: 0
     secondTestResult: 1
     requiresSpherometerAdjustment: 1
@@ -702,7 +712,9 @@ MonoBehaviour:
     paperObject: {fileID: 4452946155681086439}
     startPosition: {fileID: 1855713999}
     testPosition: {fileID: 398509236}
-    blockedPosition: {fileID: 443157135}
+    passThroughEndPosition: {fileID: 398509236}
+    blockedEndPosition: {fileID: 443157135}
+    blockedPosition: {fileID: 0}
     firstTestResult: 0
     secondTestResult: 1
     requiresSpherometerAdjustment: 1
@@ -732,6 +744,7 @@ MonoBehaviour:
   paperAnimator: {fileID: 4452946155681086440}
   passThroughTrigger: PassThrough
   blockedTrigger: Blocked
+  defaultStateName: Default_State
   paperClickCollider: {fileID: 7304722881240252304}
   paperInteractionLayer:
     serializedVersion: 2
@@ -1720,13 +1733,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 27077007}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0027, z: 0.1736}
+  m_LocalRotation: {x: -0.36561403, y: -0.60524905, z: -0.60524905, w: 0.36561403}
+  m_LocalPosition: {x: 0.0031, y: 0.0027, z: 0.128}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7371363110812755915}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -117.73}
 --- !u!1 &27644391
 GameObject:
   m_ObjectHideFlags: 0
@@ -6473,7 +6486,6 @@ MonoBehaviour:
   OnMoveEnd:
     m_PersistentCalls:
       m_Calls: []
-  testJumpIndex: 0
 --- !u!4 &164479505
 Transform:
   m_ObjectHideFlags: 0
@@ -14724,13 +14736,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 398509235}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.36561403, y: -0.60524905, z: -0.60524905, w: 0.36561403}
+  m_LocalPosition: {x: 0.0071, y: 0, z: 0.075}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1765396551635622545}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -117.73}
 --- !u!1 &404721235
 GameObject:
   m_ObjectHideFlags: 0
@@ -17297,13 +17309,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 443157134}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.36561403, y: -0.60524905, z: -0.60524905, w: 0.36561403}
+  m_LocalPosition: {x: 0.0118, y: 0, z: 0.1397}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1765396551635622545}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -117.73}
 --- !u!1 &448350222
 GameObject:
   m_ObjectHideFlags: 0
@@ -17340,7 +17352,6 @@ MonoBehaviour:
   testing: 1
   requiresInteraction: 0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101
   currentIndex: 0
-  testJumpIndex: 0
 --- !u!4 &448350224
 Transform:
   m_ObjectHideFlags: 0
@@ -30000,6 +30011,7 @@ Transform:
   - {fileID: 1803537893}
   - {fileID: 1235911751}
   - {fileID: 2102978598}
+  - {fileID: 1159000467}
   - {fileID: 1068700591}
   - {fileID: 2001381297}
   - {fileID: 2116636142}
@@ -38814,7 +38826,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &972332085
 RectTransform:
   m_ObjectHideFlags: 0
@@ -38923,7 +38935,6 @@ MonoBehaviour:
   _countText: {fileID: 433853753}
   moveDistance: 0.0001
   highlightFadeDuration: 0.4
-  _cam: {fileID: 2014502627}
   _defaultCamFOV: 70
   _slide2FOV: 45
   _slide2PageIndex: 1
@@ -42741,7 +42752,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c58e64d5f69d25d4f8c9bd1e5d01d7f1, type: 2}
+  - {fileID: 2100000, guid: 0d384473d36fdd947a71ee1863bb6390, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -45004,6 +45015,37 @@ Transform:
   - {fileID: 32296017}
   m_Father: {fileID: 538352491}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1159000466
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1159000467}
+  m_Layer: 0
+  m_Name: Slide_20_cp_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1159000467
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1159000466}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.066130586, y: 0.5829727, z: -0.17678674, w: 0.79026324}
+  m_LocalPosition: {x: -0.984, y: 1.44, z: 0.769}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 759128262}
+  m_LocalEulerAnglesHint: {x: 18.098, y: 70.867, z: -12.289}
 --- !u!1 &1163391230
 GameObject:
   m_ObjectHideFlags: 0
@@ -59035,7 +59077,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIPromptController
   pages:
   - pageName: Page 1
-    pageText: 
+    pageText: Identify the apparatus required for the experiment.
     showDialogBox: 1
     showAlternatePanels: 1
     alternatePanels:
@@ -59216,6 +59258,10 @@ MonoBehaviour:
       stayInUpcomingPages: 0
       enableOnce: 0
       hasBeenEnabledOnce: 0
+    - panel: {fileID: 8104799917181510197}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
   - pageName: Page 10
     pageText: First Click on the measuring scale then click on the pencil to draw
       a triangle.
@@ -59234,6 +59280,10 @@ MonoBehaviour:
       stayInUpcomingPages: 0
       enableOnce: 0
       hasBeenEnabledOnce: 0
+    - panel: {fileID: 8104799917181510197}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
   - pageName: Page 11
     pageText: 'Drag the measuring scale to measure the different sides of the triangle.
 
@@ -59242,6 +59292,10 @@ MonoBehaviour:
     showDialogBox: 1
     showAlternatePanels: 1
     alternatePanels:
+    - panel: {fileID: 4867448183157917197}
+      stayInUpcomingPages: 0
+      enableOnce: 1
+      hasBeenEnabledOnce: 0
     - panel: {fileID: 4867448183157917197}
       stayInUpcomingPages: 0
       enableOnce: 1
@@ -69135,7 +69189,7 @@ Transform:
   m_GameObject: {fileID: 1803537892}
   serializedVersion: 2
   m_LocalRotation: {x: 0.4353459, y: -0, z: -0, w: 0.9002633}
-  m_LocalPosition: {x: -0.381, y: 1.45, z: -0.535}
+  m_LocalPosition: {x: -0.381, y: 1.774, z: -0.535}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -70620,13 +70674,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1837901201}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.1633}
+  m_LocalRotation: {x: -0.36561403, y: -0.60524905, z: -0.60524905, w: 0.36561403}
+  m_LocalPosition: {x: -0.0053, y: 0, z: 0.0799}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7371363110812755915}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -117.73}
 --- !u!1 &1843845345
 GameObject:
   m_ObjectHideFlags: 0
@@ -78297,8 +78351,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2024491248}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.19086894, y: -0, z: -0, w: 0.98161554}
-  m_LocalPosition: {x: -0.42194894, y: 2.3, z: -1.7}
+  m_LocalRotation: {x: -0, y: -0.99320114, z: -0, w: 0.1164107}
+  m_LocalPosition: {x: -1.186, y: 1.243, z: 0.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -84150,7 +84204,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -5603170061895505077, guid: a685e1ac19a091f41bf1e73af74503a9, type: 3}
+  - {fileID: 2100000, guid: 52f42f91cdf0e2849a639f38881d79fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -85406,7 +85460,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -5603170061895505077, guid: a685e1ac19a091f41bf1e73af74503a9, type: 3}
+  - {fileID: 2100000, guid: 52f42f91cdf0e2849a639f38881d79fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -88470,7 +88524,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3947413644458072612
 Transform:
   m_ObjectHideFlags: 0
@@ -88781,7 +88835,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -5603170061895505077, guid: a685e1ac19a091f41bf1e73af74503a9, type: 3}
+  - {fileID: 2100000, guid: 52f42f91cdf0e2849a639f38881d79fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -89057,7 +89111,7 @@ Transform:
   m_GameObject: {fileID: 3929349181470122333}
   serializedVersion: 2
   m_LocalRotation: {x: -0.49685156, y: -0.5031288, z: -0.50312865, w: 0.49685165}
-  m_LocalPosition: {x: 0.227, y: 0.424, z: -0.101}
+  m_LocalPosition: {x: 0.227, y: 0.42400002, z: -0.10100001}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -90268,7 +90322,7 @@ Transform:
   m_GameObject: {fileID: 5437156578586673825}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.94, y: 0.5113, z: -0.159}
+  m_LocalPosition: {x: -0.9389, y: 0.5043, z: -0.226}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -91847,7 +91901,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -5603170061895505077, guid: a685e1ac19a091f41bf1e73af74503a9, type: 3}
+  - {fileID: 2100000, guid: 52f42f91cdf0e2849a639f38881d79fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -93363,7 +93417,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -5603170061895505077, guid: a685e1ac19a091f41bf1e73af74503a9, type: 3}
+  - {fileID: 2100000, guid: 52f42f91cdf0e2849a639f38881d79fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -94168,7 +94222,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -5603170061895505077, guid: a685e1ac19a091f41bf1e73af74503a9, type: 3}
+  - {fileID: 2100000, guid: 52f42f91cdf0e2849a639f38881d79fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -94735,7 +94789,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -5603170061895505077, guid: a685e1ac19a091f41bf1e73af74503a9, type: 3}
+  - {fileID: 2100000, guid: 52f42f91cdf0e2849a639f38881d79fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
