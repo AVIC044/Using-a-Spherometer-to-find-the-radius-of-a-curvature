@@ -106,6 +106,32 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -113,12 +139,12 @@ TextureImporter:
       name: ROUNDED_0
       rect:
         serializedVersion: 2
-        x: 6
-        y: 0
-        width: 4161
-        height: 4167
+        x: 450
+        y: 450
+        width: 3249
+        height: 3263
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -127,6 +153,644 @@ TextureImporter:
       bones: []
       spriteID: cfb9b21230577c1438e74c3e2e594b60
       internalID: -59573150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_1
+      rect:
+        serializedVersion: 2
+        x: 1941
+        y: 3711
+        width: 24
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6858ce256682af4ea1bda2de7b0fbd3
+      internalID: 552711618
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_2
+      rect:
+        serializedVersion: 2
+        x: 2002
+        y: 3711
+        width: 98
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59a946930690c4d4682e5f5738306730
+      internalID: 1381628284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_3
+      rect:
+        serializedVersion: 2
+        x: 2112
+        y: 3711
+        width: 49
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca115c07694da384793f940fe3c3311b
+      internalID: -979960945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_4
+      rect:
+        serializedVersion: 2
+        x: 2173
+        y: 3711
+        width: 37
+        height: 10
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5656535f4c193564db192ce488a82748
+      internalID: 683109092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_5
+      rect:
+        serializedVersion: 2
+        x: 2271
+        y: 3699
+        width: 24
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8fc7d3da82a70d541ac4af12e73e8328
+      internalID: -1324976925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_6
+      rect:
+        serializedVersion: 2
+        x: 2356
+        y: 3687
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 793b8b30c78952045bb358ece0fea5ed
+      internalID: -421548344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_7
+      rect:
+        serializedVersion: 2
+        x: 3699
+        y: 2283
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e086f5ebf20be7b49b0105b7fbf00543
+      internalID: 1930017651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_8
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 2258
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5f715efe6f817694da15695723d5be84
+      internalID: -643989812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_9
+      rect:
+        serializedVersion: 2
+        x: 3711
+        y: 2234
+        width: 6
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3309688fa10b7b34e8800e388e6de0af
+      internalID: -122641645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_10
+      rect:
+        serializedVersion: 2
+        x: 3711
+        y: 2197
+        width: 8
+        height: 25
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 12f732ec294772b4a95276d842e1e709
+      internalID: 740265777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_11
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 2112
+        width: 8
+        height: 73
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65db674bf95a70948a28ee1eb77dcfc2
+      internalID: -864437158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_12
+      rect:
+        serializedVersion: 2
+        x: 3711
+        y: 2149
+        width: 10
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a565ed7d49190142a11911f3366e922
+      internalID: -1929416011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_13
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 2027
+        width: 8
+        height: 73
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49111be245bf7a2488314bea1181707e
+      internalID: 621596969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_14
+      rect:
+        serializedVersion: 2
+        x: 3711
+        y: 2027
+        width: 14
+        height: 109
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d4dcca40672dad4aa0e42914fabfd37
+      internalID: -184002539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_15
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 2002
+        width: 6
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bffef7f920237964ea3ff7688b55fac3
+      internalID: -179541517
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_16
+      rect:
+        serializedVersion: 2
+        x: 3711
+        y: 1978
+        width: 12
+        height: 36
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e0f579dab3b6ed54faf74ef4f52a14da
+      internalID: 290934033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_17
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 1941
+        width: 4
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 895db310c5e57bf4c9f806fb3b1c30a4
+      internalID: -1439624741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_18
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 1917
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 25d465f078bfd114fb5d7cef828769f2
+      internalID: -1241144490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_19
+      rect:
+        serializedVersion: 2
+        x: 3711
+        y: 1917
+        width: 6
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c209d415c16c964b88744587cc4bcb5
+      internalID: -28617805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_20
+      rect:
+        serializedVersion: 2
+        x: 456
+        y: 1880
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: efa7fd31611037e4e88f8aa0b676455c
+      internalID: 571657165
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_21
+      rect:
+        serializedVersion: 2
+        x: 3699
+        y: 1878
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29e03b414a957f945a891015513d1a15
+      internalID: 1089640482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_22
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 1819
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44a4f67cffd74494ea5e638ce7056f22
+      internalID: -1939434669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_23
+      rect:
+        serializedVersion: 2
+        x: 3687
+        y: 1795
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49d97bd22c40a48428c059d2bdb39149
+      internalID: -1495963833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_24
+      rect:
+        serializedVersion: 2
+        x: 1819
+        y: 462
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aac68ed0ead1a5041b4df23174ae43f9
+      internalID: -1423946866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_25
+      rect:
+        serializedVersion: 2
+        x: 2210
+        y: 450
+        width: 48
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9c5373bf3d4d0940af7875fc8c706d7
+      internalID: -1893265753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_26
+      rect:
+        serializedVersion: 2
+        x: 2332
+        y: 464
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4096daf75769e6d49a3619e3da3c1767
+      internalID: -1731022151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_27
+      rect:
+        serializedVersion: 2
+        x: 1978
+        y: 444
+        width: 49
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e16526a0406cfba47af35ac07764712f
+      internalID: 1436730606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_28
+      rect:
+        serializedVersion: 2
+        x: 2039
+        y: 444
+        width: 85
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b07ad32c7f77cc84ab0c42df59b113c2
+      internalID: -1008813009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ROUNDED_29
+      rect:
+        serializedVersion: 2
+        x: 2136
+        y: 446
+        width: 37
+        height: 6
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a908f048f3d6a6419e7c2016d45e6d0
+      internalID: 2023841055
       vertices: []
       indices: 
       edges: []
@@ -143,9 +807,40 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       ROUNDED_0: -59573150
+      ROUNDED_1: 552711618
+      ROUNDED_10: 740265777
+      ROUNDED_11: -864437158
+      ROUNDED_12: -1929416011
+      ROUNDED_13: 621596969
+      ROUNDED_14: -184002539
+      ROUNDED_15: -179541517
+      ROUNDED_16: 290934033
+      ROUNDED_17: -1439624741
+      ROUNDED_18: -1241144490
+      ROUNDED_19: -28617805
+      ROUNDED_2: 1381628284
+      ROUNDED_20: 571657165
+      ROUNDED_21: 1089640482
+      ROUNDED_22: -1939434669
+      ROUNDED_23: -1495963833
+      ROUNDED_24: -1423946866
+      ROUNDED_25: -1893265753
+      ROUNDED_26: -1731022151
+      ROUNDED_27: 1436730606
+      ROUNDED_28: -1008813009
+      ROUNDED_29: 2023841055
+      ROUNDED_3: -979960945
+      ROUNDED_4: 683109092
+      ROUNDED_5: -1324976925
+      ROUNDED_6: -421548344
+      ROUNDED_7: 1930017651
+      ROUNDED_8: -643989812
+      ROUNDED_9: -122641645
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
