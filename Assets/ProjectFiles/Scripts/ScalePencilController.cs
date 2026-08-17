@@ -465,20 +465,26 @@ public class ScalePencilController : MonoBehaviour
         DrawingSegment seg = drawingSegments[currentSegmentIndex];
         if (seg.isComplete) return;
 
-        if (filterPaperCollider == null) return;
-
         Ray ray = activeCamera.ScreenPointToRay(screenPosition);
-        if (!filterPaperCollider.Raycast(ray, out RaycastHit paperHit, 1000f))
-            return;
+        Vector3 target;
 
-        Vector3 target = paperHit.point + pencilOffset;
-
-        float paperTopY = filterPaperCollider.bounds.max.y;
-        Collider pencilCol = pencilObject.GetComponentInChildren<Collider>();
-        if (pencilCol != null)
-            target.y = paperTopY + pencilCol.bounds.extents.y + pencilPaperOffset;
+        if (filterPaperCollider != null && filterPaperCollider.Raycast(ray, out RaycastHit paperHit, 1000f))
+        {
+            target = paperHit.point + pencilOffset;
+            float paperTopY = filterPaperCollider.bounds.max.y;
+            Collider pencilCol = pencilObject.GetComponentInChildren<Collider>();
+            target.y = (pencilCol != null) ? paperTopY + pencilCol.bounds.extents.y + pencilPaperOffset : paperTopY + 0.1f;
+        }
         else
-            target.y = paperTopY + 0.1f;
+        {
+            // Fallback ground plane if filterPaperCollider is unassigned or missed
+            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+            if (groundPlane.Raycast(ray, out float enter))
+            {
+                target = ray.GetPoint(enter) + pencilOffset;
+            }
+            else return;
+        }
 
         pencilObject.transform.position = Vector3.Lerp(
             pencilObject.transform.position,

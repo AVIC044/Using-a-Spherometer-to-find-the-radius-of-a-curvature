@@ -22,6 +22,10 @@ public class DraggableObject : MonoBehaviour
         public bool restoreToSnapWhenConditionActive = true;
         public UnityEvent OnSnapCompleted;
 
+        [Header("Per-Index Rotation")]
+        [Tooltip("Additional Euler rotation applied to this object for this page. Use (0, 180, 0) to flip around Y.")]
+        public Vector3 rotationOffsetEuler = Vector3.zero;
+
         [Header("Display Options")]
         [Tooltip("If enabled, first time this index is reached, interaction will be ignored.")]
         public bool enableFirstIgnore = false;
@@ -206,7 +210,7 @@ public class DraggableObject : MonoBehaviour
             {
                 transform.position = t.position;
                 if (snapRotation)
-                    transform.rotation = t.rotation;
+                    transform.rotation = t.rotation * Quaternion.Euler(element.rotationOffsetEuler);
             }
         }
     }
@@ -409,15 +413,17 @@ public class DraggableObject : MonoBehaviour
 
         transform.position = Vector3.Lerp(transform.position, target.position, snapSpeed * Time.deltaTime);
 
+        Quaternion targetRotation = target.rotation * Quaternion.Euler(element.rotationOffsetEuler);
+
         if (snapRotation)
-            transform.rotation = Quaternion.Slerp(transform.rotation, target.rotation, snapSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, snapSpeed * Time.deltaTime);
 
         if (Vector3.Distance(transform.position, target.position) < snapDistance)
         {
             transform.position = target.position;
 
             if (snapRotation)
-                transform.rotation = target.rotation;
+                transform.rotation = targetRotation;
 
             snapping = false;
 

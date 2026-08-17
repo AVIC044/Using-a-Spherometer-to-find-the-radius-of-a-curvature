@@ -3,7 +3,12 @@ guid: 9046291d59ec31a4fae2e8eb72bab0d5
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Vernier Caliper
+    second: {fileID: 2100000, guid: 75058486fb58fce47bc26bf992f4732b, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

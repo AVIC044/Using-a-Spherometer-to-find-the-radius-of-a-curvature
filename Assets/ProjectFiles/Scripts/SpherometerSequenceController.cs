@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Events;
 
 public class SpherometerSequenceController : MonoBehaviour
@@ -16,31 +17,51 @@ public class SpherometerSequenceController : MonoBehaviour
         Complete
     }
 
+    public enum PageActionType
+    {
+        None,
+        PrickPage,
+        PutAsidePage
+    }
+
+    [System.Serializable]
+    public class SpherometerPageConfig
+    {
+        public int pageIndex;
+        public PageActionType actionType;
+
+        [Header("Prick Settings")]
+        public Transform prickTargetTransform;
+        public Transform postDotsCameraTarget;
+        public GameObject dotsCanvas;
+
+        [Header("Put Aside Settings")]
+        public Transform offCameraPosition;
+    }
+
     [Header("Spherometer")]
     public GameObject spherometerObject;
-    public Transform prickTargetTransform;      // optional: small dip/rotate on prick
     public float prickDuration = 0.5f;
 
-    [Header("Dots")]
-    public GameObject dotsCanvas;
+    [Header("Prick Default")]
+    public Transform prickTargetTransform;
+
+    [Header("Dots Default")]
     public float dotAppearDelay = 0.2f;
 
-    [Header("Put Aside")]
-    public Transform offCameraPosition;
+    [Header("Put Aside Default")]
     public float moveAwayDuration = 1.2f;
 
     [Header("Drawing Controller")]
     public ScalePencilController scalePencilController;
 
-    [Header("Camera")]
+    [Header("Camera Defaults")]
     public Camera mainCamera;
-    public Transform postDotsCameraTarget;
     public float cameraMoveDuration = 1f;
     public AnimationCurve cameraMoveCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
-    [Header("Page Sync")]
-    public int prickPageIndex = 0;
-    public int putAsidePageIndex = 1;
+    [Header("Per-Index Page Configuration")]
+    public List<SpherometerPageConfig> pageConfigs = new List<SpherometerPageConfig>();
     public bool resetOnPageLeave = true;
 
     [Header("Events")]
@@ -52,6 +73,7 @@ public class SpherometerSequenceController : MonoBehaviour
     private SequenceStage currentStage = SequenceStage.Inactive;
     private Camera activeCamera;
     private int currentPageIndex = -1;
+    private SpherometerPageConfig currentConfig;
 
     // captured transform after drag-drop
     private Vector3 paperPosition;
@@ -72,7 +94,7 @@ public class SpherometerSequenceController : MonoBehaviour
     private void Start()
     {
         activeCamera = mainCamera != null ? mainCamera : Camera.main;
-        if (dotsCanvas != null) dotsCanvas.SetActive(false);
+        DisableAllDotsCanvases();
     }
 
     private void Update()
@@ -89,23 +111,31 @@ public class SpherometerSequenceController : MonoBehaviour
     private void HandlePageChanged(int pageIndex)
     {
         currentPageIndex = pageIndex;
+        SpherometerPageConfig config = GetConfigForPage(pageIndex);
 
-        if (resetOnPageLeave &&
-            currentPageIndex != prickPageIndex &&
-            currentPageIndex != putAsidePageIndex)
+        if (config == null || config.actionType == PageActionType.None)
         {
-            if (currentStage != SequenceStage.Inactive)
+            if (resetOnPageLeave && currentStage != SequenceStage.Inactive)
+            {
                 ResetSequence();
+            }
             return;
         }
 
-        if (pageIndex == prickPageIndex)
-            EnterPrickPage();
-        else if (pageIndex == putAsidePageIndex)
-            EnterPutAsidePage();
+        currentConfig = config;
+
+        switch (config.actionType)
+        {
+            case PageActionType.PrickPage:
+                EnterPrickPage(config);
+                break;
+            case PageActionType.PutAsidePage:
+                EnterPutAsidePage(config);
+                break;
+        }
     }
 
-    private void EnterPrickPage()
+    private void EnterPrickPage(SpherometerPageConfig config)
     {
         if (spherometerObject != null)
         {
@@ -114,11 +144,11 @@ public class SpherometerSequenceController : MonoBehaviour
             paperScale = spherometerObject.transform.localScale;
         }
 
-        if (dotsCanvas != null) dotsCanvas.SetActive(false);
+        if (config.dotsCanvas != null) config.dotsCanvas.SetActive(false);
         currentStage = SequenceStage.PrickPage_Waiting;
     }
 
-    private void EnterPutAsidePage()
+    private void EnterPutAsidePage(SpherometerPageConfig config)
     {
         if (spherometerObject != null)
         {
@@ -128,7 +158,7 @@ public class SpherometerSequenceController : MonoBehaviour
             spherometerObject.SetActive(true);
         }
 
-        if (dotsCanvas != null) dotsCanvas.SetActive(true);
+        if (config.dotsCanvas != null) config.dotsCanvas.SetActive(true);
         currentStage = SequenceStage.PutAsidePage_Waiting;
     }
 
@@ -147,6 +177,8 @@ public class SpherometerSequenceController : MonoBehaviour
 
         if (!screenPos.HasValue) return;
 
+        Debug.Log($"[SpherometerSequence] Click detected at screen position {screenPos.Value}. Page={currentPageIndex}, Stage={currentStage}");
+
         if (UnityEngine.EventSystems.EventSystem.current != null)
         {
             if (Input.touchCount > 0)
@@ -159,55 +191,58 @@ public class SpherometerSequenceController : MonoBehaviour
         }
 
         Ray ray = activeCamera.ScreenPointToRay(screenPos.Value);
-        if (!Physics.Raycast(ray, out RaycastHit hit, 1000f)) return;
+        RaycastHit[] hits = Physics.RaycastAll(ray, 1000f);
 
-        if (!IsPartOfObject(hit.collider.gameObject, spherometerObject)) return;
+        foreach (RaycastHit hit in hits)
+        {
+            Debug.Log($"[SpherometerSequence] Raycast hit: {hit.collider.gameObject.name}");
 
-        if (currentStage == SequenceStage.PrickPage_Waiting)
-            OnPrickPageClicked();
-        else if (currentStage == SequenceStage.PutAsidePage_Waiting)
-            OnPutAsidePageClicked();
+            if (!IsPartOfObject(hit.collider.gameObject, spherometerObject))
+                continue;
+
+            Debug.Log($"[SpherometerSequence] Spherometer hit detected: {hit.collider.gameObject.name}. Page={currentPageIndex}, Stage={currentStage}");
+
+            if (currentStage == SequenceStage.PrickPage_Waiting)
+            {
+                Debug.Log("[SpherometerSequence] Prick-page click accepted.");
+                OnPrickPageClicked();
+                return;
+            }
+
+            if (currentStage == SequenceStage.PutAsidePage_Waiting)
+            {
+                Debug.Log("[SpherometerSequence] Put-aside click accepted.");
+                OnPutAsidePageClicked();
+                return;
+            }
+
+            Debug.Log($"[SpherometerSequence] Spherometer clicked, but current stage does not accept input: {currentStage}");
+        }
+
+        Debug.Log("[SpherometerSequence] Click raycast did not hit the configured Spherometer object.");
     }
 
     private void OnPrickPageClicked()
     {
-        currentStage = SequenceStage.PrickPage_Pricking;
+        Debug.Log($"[SpherometerSequence] Prick page clicked on index {currentPageIndex}.");
+
+        GameObject activeDotsCanvas = currentConfig != null ? currentConfig.dotsCanvas : null;
+
+        if (activeDotsCanvas != null)
+        {
+            activeDotsCanvas.SetActive(true);
+            Debug.Log($"[SpherometerSequence] Dots UI enabled: {activeDotsCanvas.name}");
+        }
+        else
+        {
+            Debug.LogWarning($"[SpherometerSequence] No Dots Canvas assigned for page {currentPageIndex}.");
+        }
+
         onSpherometerPricked?.Invoke();
-        StartCoroutine(PrickRoutine());
-    }
-
-    private IEnumerator PrickRoutine()
-    {
-        if (prickTargetTransform != null)
-        {
-            yield return StartCoroutine(AnimateSpherometerTo(
-                prickTargetTransform.position,
-                prickTargetTransform.rotation,
-                prickTargetTransform.localScale,
-                prickDuration));
-        }
-
-        if (postDotsCameraTarget != null)
-            yield return StartCoroutine(MoveCameraRoutine(postDotsCameraTarget));
-
-        yield return new WaitForSeconds(dotAppearDelay);
-
-        if (dotsCanvas != null)
-        {
-            dotsCanvas.SetActive(true);
-            dotsCanvas.transform.localScale = Vector3.zero;
-            float t = 0f;
-            while (t < 0.3f)
-            {
-                t += Time.deltaTime;
-                dotsCanvas.transform.localScale = Vector3.one * Mathf.SmoothStep(0f, 1f, t / 0.3f);
-                yield return null;
-            }
-            dotsCanvas.transform.localScale = Vector3.one;
-        }
-
         onDotsShown?.Invoke();
+
         currentStage = SequenceStage.PrickPage_DotsShown;
+        Debug.Log($"[SpherometerSequence] Prick page complete on index {currentPageIndex}.");
     }
 
     private void OnPutAsidePageClicked()
@@ -219,12 +254,14 @@ public class SpherometerSequenceController : MonoBehaviour
 
     private IEnumerator PutAsideRoutine()
     {
-        if (spherometerObject != null && offCameraPosition != null)
+        Transform offCam = currentConfig != null ? currentConfig.offCameraPosition : null;
+
+        if (spherometerObject != null && offCam != null)
         {
             yield return StartCoroutine(AnimateSpherometerTo(
-                offCameraPosition.position,
-                offCameraPosition.rotation,
-                offCameraPosition.localScale,
+                offCam.position,
+                offCam.rotation,
+                offCam.localScale,
                 moveAwayDuration));
 
             spherometerObject.SetActive(false);
@@ -295,12 +332,33 @@ public class SpherometerSequenceController : MonoBehaviour
         if (spherometerObject != null)
             spherometerObject.SetActive(true);
 
-        if (dotsCanvas != null) dotsCanvas.SetActive(false);
+        DisableAllDotsCanvases();
 
         if (scalePencilController != null)
         {
             scalePencilController.ResetController();
             scalePencilController.enabled = false;
+        }
+
+        currentConfig = null;
+    }
+
+    private SpherometerPageConfig GetConfigForPage(int pageIndex)
+    {
+        foreach (var config in pageConfigs)
+        {
+            if (config != null && config.pageIndex == pageIndex)
+                return config;
+        }
+        return null;
+    }
+
+    private void DisableAllDotsCanvases()
+    {
+        foreach (var config in pageConfigs)
+        {
+            if (config != null && config.dotsCanvas != null)
+                config.dotsCanvas.SetActive(false);
         }
     }
 

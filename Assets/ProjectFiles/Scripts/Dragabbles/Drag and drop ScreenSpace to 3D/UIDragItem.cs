@@ -72,6 +72,7 @@ namespace DeterminingMassofaBodyUsingMeterscale
 
         public void OnBeginDrag(PointerEventData eventData)
         {
+            Debug.Log("PROTRACTOR DRAG STARTED");
             originalPosition = rectTransform.anchoredPosition;
 
             canvasGroup.blocksRaycasts = false;
@@ -119,7 +120,12 @@ namespace DeterminingMassofaBodyUsingMeterscale
 
                 if (target != null && target.TryDrop(this))
                 {
-                    StartScale(originalScale);
+                    // TryDrop may have already disabled this GameObject (correct drop
+                    // hides the icon). Coroutines can't start on an inactive object,
+                    // and there's nothing to animate back to anyway in that case.
+                    if (gameObject.activeInHierarchy)
+                        StartScale(originalScale);
+
                     return;
                 }
             }
