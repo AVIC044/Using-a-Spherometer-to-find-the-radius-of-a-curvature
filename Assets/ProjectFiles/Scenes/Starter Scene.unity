@@ -263,7 +263,7 @@ GameObject:
   - component: {fileID: 3122695}
   - component: {fileID: 3122694}
   m_Layer: 0
-  m_Name: Dot_3
+  m_Name: Dot_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6887,7 +6887,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   moveDuration: 1.5
-  activePageIndices: 08000000
+  activePageIndices: 0a000000
   resetOnPageLeave: 0
   onAllMeasurementsComplete:
     m_PersistentCalls:
@@ -9619,8 +9619,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 242476005}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.14635937, y: -0, z: -0, w: 0.98923147}
-  m_LocalPosition: {x: -0.26994893, y: 1.28, z: -0.03}
+  m_LocalRotation: {x: 0.19077708, y: -0.012802603, z: 0.0084407665, w: 0.9815136}
+  m_LocalPosition: {x: -0.419, y: 2.04, z: -0.726}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18428,8 +18428,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 464092800}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.14635937, y: -0, z: -0, w: 0.98923147}
-  m_LocalPosition: {x: -0.26994893, y: 1.28, z: -0.03}
+  m_LocalRotation: {x: 0.19077708, y: -0.012802603, z: 0.0084407665, w: 0.9815136}
+  m_LocalPosition: {x: -0.419, y: 2.04, z: -0.726}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -20254,7 +20254,7 @@ Transform:
   m_GameObject: {fileID: 518676620}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.1049, y: 0.0024, z: -0.0108}
+  m_LocalPosition: {x: 0.1049, y: 0.0034, z: -0.0108}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21578,8 +21578,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 541759528}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.14635937, y: -0, z: -0, w: 0.98923147}
-  m_LocalPosition: {x: -0.26994893, y: 1.28, z: -0.03}
+  m_LocalRotation: {x: 0.19077708, y: -0.012802603, z: 0.0084407665, w: 0.9815136}
+  m_LocalPosition: {x: -0.419, y: 2.04, z: -0.726}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24113,7 +24113,7 @@ GameObject:
   - component: {fileID: 611788442}
   - component: {fileID: 611788441}
   m_Layer: 0
-  m_Name: Dot_2
+  m_Name: Dot_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25708,8 +25708,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 649087148}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.10371274, y: -0, z: -0, w: 0.9946073}
-  m_LocalPosition: {x: -0.26994893, y: 1.195, z: -0.05}
+  m_LocalRotation: {x: 0.19077708, y: -0.012802603, z: 0.0084407665, w: 0.9815136}
+  m_LocalPosition: {x: -0.419, y: 2.04, z: -0.726}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -29163,8 +29163,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 730825306}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0.036370993, y: 0.0767, z: 0.049184218}
+  m_LocalRotation: {x: -0.7070007, y: -0.0012193267, z: -0.003715963, w: 0.70720214}
+  m_LocalPosition: {x: -0.0050001144, y: -0.029340144, z: 0.055384174}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -37268,6 +37268,7 @@ MonoBehaviour:
   pencilTip: {fileID: 518676621}
   mainCamera: {fileID: 1147446644}
   filterPaperCollider: {fileID: 8104799917181510199}
+  paperNormalAxis: 1
   scalePageStart: {fileID: 531612603}
   pencilPageStart: {fileID: 2131891724}
   scalePoses:
@@ -37294,14 +37295,13 @@ MonoBehaviour:
   - segmentName: AB
     requiredScalePoseIndex: 0
     requirePencilNearStart: 1
-    startProximityThreshold: 0
-    startPoint: {fileID: 3122693}
-    endPoint: {fileID: 750719925}
-    lineMode: 2
-    lineImage: {fileID: 0}
-    lineWidth: 0.5
-    lineColor: {r: 0, g: 0, b: 0, a: 0}
+    startProximityThreshold: 0.4
+    startPoint: {fileID: 750719925}
+    endPoint: {fileID: 3122693}
+    lineWidth: 0.01
+    lineColor: {r: 0, g: 0, b: 0, a: 1}
     surfaceOffset: 0
+    visiblePageIndices: 090000000a0000000b000000
     snapPencilToEnd: 1
     endPoseOverride: {fileID: 0}
     cameraTarget: {fileID: 1147446645}
@@ -37309,9 +37309,6 @@ MonoBehaviour:
     cameraMoveDuration: 0
     waitAfterCompletion: 0
     onSegmentStart:
-      m_PersistentCalls:
-        m_Calls: []
-    onSegmentComplete:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 935278240}
@@ -37326,18 +37323,32 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 1
           m_CallState: 2
+    onSegmentComplete:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1605009923}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
   - segmentName: BC
     requiredScalePoseIndex: 1
     requirePencilNearStart: 1
-    startProximityThreshold: 0
+    startProximityThreshold: 0.4
     startPoint: {fileID: 3122693}
     endPoint: {fileID: 611788440}
-    lineMode: 2
-    lineImage: {fileID: 0}
-    lineWidth: 0.5
-    lineColor: {r: 0, g: 0, b: 0, a: 0}
+    lineWidth: 0.01
+    lineColor: {r: 0, g: 0, b: 0, a: 1}
     surfaceOffset: 0
-    snapPencilToEnd: 0
+    visiblePageIndices: 090000000a0000000b000000
+    snapPencilToEnd: 1
     endPoseOverride: {fileID: 0}
     cameraTarget: {fileID: 1147446645}
     holdDuration: 0
@@ -37364,14 +37375,13 @@ MonoBehaviour:
   - segmentName: CA
     requiredScalePoseIndex: 2
     requirePencilNearStart: 1
-    startProximityThreshold: 0
-    startPoint: {fileID: 750719925}
-    endPoint: {fileID: 3122693}
-    lineMode: 2
-    lineImage: {fileID: 0}
-    lineWidth: 0.5
-    lineColor: {r: 0, g: 0, b: 0, a: 0}
+    startProximityThreshold: 0.4
+    startPoint: {fileID: 611788440}
+    endPoint: {fileID: 750719925}
+    lineWidth: 0.01
+    lineColor: {r: 0, g: 0, b: 0, a: 1}
     surfaceOffset: 0
+    visiblePageIndices: 090000000a0000000b000000
     snapPencilToEnd: 1
     endPoseOverride: {fileID: 0}
     cameraTarget: {fileID: 1147446645}
@@ -37398,7 +37408,9 @@ MonoBehaviour:
         m_Calls: []
   dragSpeed: 20
   moveDuration: 1.5
-  pencilPaperOffset: 0.02
+  pencilPaperOffset: 0
+  drawingRotationEuler: {x: 0, y: 0, z: -90}
+  drawingRotationDuration: 0.15
   targetCamera: {fileID: 1147446644}
   cameraMoveCurve:
     serializedVersion: 2
@@ -60670,6 +60682,22 @@ MonoBehaviour:
       stayInUpcomingPages: 0
       enableOnce: 0
       hasBeenEnabledOnce: 0
+    - panel: {fileID: 1584442327}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 750719924}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 3122692}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 611788439}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
   - pageName: Page 9
     pageText: Click the Spherometer to put it aside
     showDialogBox: 1
@@ -60684,6 +60712,22 @@ MonoBehaviour:
       enableOnce: 0
       hasBeenEnabledOnce: 0
     - panel: {fileID: 8104799917181510197}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 1584442327}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 750719924}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 3122692}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 611788439}
       stayInUpcomingPages: 0
       enableOnce: 0
       hasBeenEnabledOnce: 0
@@ -60709,6 +60753,54 @@ MonoBehaviour:
       stayInUpcomingPages: 0
       enableOnce: 0
       hasBeenEnabledOnce: 0
+    - panel: {fileID: 1584442327}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 750719924}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 3122692}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 611788439}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 935278240}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 1605009923}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 650820782}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 609022853}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 720002874}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 730825306}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 531612602}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 2131891723}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
   - pageName: Page 11
     pageText: 'Drag the measuring scale to measure the different sides of the triangle.
 
@@ -60721,9 +60813,45 @@ MonoBehaviour:
       stayInUpcomingPages: 0
       enableOnce: 1
       hasBeenEnabledOnce: 0
-    - panel: {fileID: 4867448183157917197}
+    - panel: {fileID: 1584442327}
       stayInUpcomingPages: 0
-      enableOnce: 1
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 521488763}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 1066216714}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 1857096125}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 935278240}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 1605009923}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 650820782}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 609022853}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 720002874}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 730825306}
+      stayInUpcomingPages: 0
+      enableOnce: 0
       hasBeenEnabledOnce: 0
   - pageName: Page 12
     pageText: Insert the observed values
@@ -64091,7 +64219,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1584442328
 RectTransform:
   m_ObjectHideFlags: 0
@@ -64108,8 +64236,8 @@ RectTransform:
   - {fileID: 1605009924}
   - {fileID: 650820783}
   - {fileID: 750719925}
-  - {fileID: 611788440}
   - {fileID: 3122693}
+  - {fileID: 611788440}
   - {fileID: 521488764}
   - {fileID: 1066216715}
   - {fileID: 1857096126}
@@ -67621,8 +67749,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1695569261}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.14635937, y: -0, z: -0, w: 0.98923147}
-  m_LocalPosition: {x: -0.26994893, y: 1.28, z: -0.03}
+  m_LocalRotation: {x: 0.19077708, y: -0.012802603, z: 0.0084407665, w: 0.9815136}
+  m_LocalPosition: {x: -0.419, y: 2.04, z: -0.726}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -67716,6 +67844,37 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1714367169
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1714367170}
+  m_Layer: 0
+  m_Name: Dot_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1714367170
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714367169}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.716}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6594271256629836443}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1714859794
 GameObject:
   m_ObjectHideFlags: 0
@@ -93948,6 +94107,7 @@ Transform:
   - {fileID: 1914894544}
   - {fileID: 1767316750}
   - {fileID: 1306455677}
+  - {fileID: 1714367170}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &6611686084203106561
