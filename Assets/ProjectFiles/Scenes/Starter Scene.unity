@@ -37436,8 +37436,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  activePageIndices: 09000000
-  resetOnPageLeave: 1
+  activePageIndices: 090000000a0000000b000000
+  resetOnPageLeave: 0
   onAllSegmentsComplete:
     m_PersistentCalls:
       m_Calls: []
@@ -60686,18 +60686,6 @@ MonoBehaviour:
       stayInUpcomingPages: 0
       enableOnce: 0
       hasBeenEnabledOnce: 0
-    - panel: {fileID: 750719924}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 3122692}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 611788439}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
   - pageName: Page 9
     pageText: Click the Spherometer to put it aside
     showDialogBox: 1
@@ -60716,18 +60704,6 @@ MonoBehaviour:
       enableOnce: 0
       hasBeenEnabledOnce: 0
     - panel: {fileID: 1584442327}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 750719924}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 3122692}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 611788439}
       stayInUpcomingPages: 0
       enableOnce: 0
       hasBeenEnabledOnce: 0
@@ -60754,50 +60730,6 @@ MonoBehaviour:
       enableOnce: 0
       hasBeenEnabledOnce: 0
     - panel: {fileID: 1584442327}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 750719924}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 3122692}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 611788439}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 935278240}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 1605009923}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 650820782}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 609022853}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 720002874}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 730825306}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 531612602}
-      stayInUpcomingPages: 0
-      enableOnce: 0
-      hasBeenEnabledOnce: 0
-    - panel: {fileID: 2131891723}
       stayInUpcomingPages: 0
       enableOnce: 0
       hasBeenEnabledOnce: 0
@@ -60850,6 +60782,10 @@ MonoBehaviour:
       enableOnce: 0
       hasBeenEnabledOnce: 0
     - panel: {fileID: 730825306}
+      stayInUpcomingPages: 0
+      enableOnce: 0
+      hasBeenEnabledOnce: 0
+    - panel: {fileID: 8104799917181510197}
       stayInUpcomingPages: 0
       enableOnce: 0
       hasBeenEnabledOnce: 0
@@ -88002,7 +87938,6 @@ MonoBehaviour:
   returnSpeed: 6
   snapDistance: 0.01
   snapRotation: 0
-  snapRotationThreshold: 0.5
   triggerEventOnly: 0
   dragSurfaceMask:
     serializedVersion: 2
@@ -92667,7 +92602,6 @@ MonoBehaviour:
   returnSpeed: 6
   snapDistance: 0.01
   snapRotation: 1
-  snapRotationThreshold: 0.5
   triggerEventOnly: 0
   dragSurfaceMask:
     serializedVersion: 2
@@ -94980,7 +94914,6 @@ MonoBehaviour:
   returnSpeed: 6
   snapDistance: 0.01
   snapRotation: 0
-  snapRotationThreshold: 0.5
   triggerEventOnly: 0
   dragSurfaceMask:
     serializedVersion: 2
@@ -95930,7 +95863,6 @@ MonoBehaviour:
   returnSpeed: 6
   snapDistance: 0.01
   snapRotation: 0
-  snapRotationThreshold: 0.5
   triggerEventOnly: 0
   dragSurfaceMask:
     serializedVersion: 2

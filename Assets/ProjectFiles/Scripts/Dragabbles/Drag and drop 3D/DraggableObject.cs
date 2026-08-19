@@ -50,7 +50,7 @@ public class DraggableObject : MonoBehaviour
 
     [Header("Rotation")]
     [SerializeField] private bool snapRotation = false;
-    [SerializeField] private float snapRotationThreshold = 0.5f;
+    // [SerializeField] private float snapRotationThreshold = 0.5f;
 
     [Header("Mode")]
     [SerializeField] private bool triggerEventOnly = false;
