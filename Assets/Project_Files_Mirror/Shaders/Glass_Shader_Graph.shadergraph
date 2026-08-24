@@ -858,7 +858,7 @@
     "m_Hidden": false,
     "m_PerRendererData": false,
     "m_customAttributes": [],
-    "m_Value": 1.0,
+    "m_Value": 0.10000000149011612,
     "m_FloatType": 1,
     "m_LiteralFloatMode": false,
     "m_RangeValues": {
@@ -1828,8 +1828,8 @@
     "m_ObjectId": "91eccbc363cb40d1918c713a0af73d64",
     "m_Title": "Reflection",
     "m_Position": {
-        "x": -1409.60009765625,
-        "y": 201.60011291503907
+        "x": -1409.5999755859375,
+        "y": 201.60009765625
     }
 }
 

@@ -46,7 +46,7 @@ public class SpherometerStepController : MonoBehaviour
 {
     [Header("General References")]
     [SerializeField] private MeshRenderer _spehrometerRotationObject;
-    [SerializeField] private TMP_Text _countText;
+    // [SerializeField] private TMP_Text _countText;
 
     [Header("Slide Configurations")]
     [SerializeField] private List<SpherometerSlideData> slideDataList = new();
@@ -92,10 +92,10 @@ public class SpherometerStepController : MonoBehaviour
 
     private void Start()
     {
-        if (_countText != null)
-        {
-            _countText.gameObject.SetActive(false);
-        }
+        // if (_countText != null)
+        // {
+        //     _countText.gameObject.SetActive(false);
+        // }
 
         HandlePageChanged(PageNavigationController.CurrentIndex);
     }
@@ -145,10 +145,10 @@ public class SpherometerStepController : MonoBehaviour
         currentRotationCount = 0;
         isAnimating = false;
 
-        if (_countText != null)
-        {
-            _countText.gameObject.SetActive(false);
-        }
+        // if (_countText != null)
+        // {
+        //     _countText.gameObject.SetActive(false);
+        // }
 
         // A new page starts a new spherometer sequence. Show the highlight
         // only when there is actually a configured step waiting for input.
@@ -228,11 +228,11 @@ public class SpherometerStepController : MonoBehaviour
 
         currentRotationCount++;
 
-        if (_countText != null)
-        {
-            _countText.text = currentRotationCount.ToString();
-            _countText.gameObject.SetActive(true);
-        }
+        // if (_countText != null)
+        // {
+        //     _countText.text = currentRotationCount.ToString();
+        //     _countText.gameObject.SetActive(true);
+        // }
 
         // 2. Fire completion events
         if (mapping != null) mapping.onStepCompleted?.Invoke();

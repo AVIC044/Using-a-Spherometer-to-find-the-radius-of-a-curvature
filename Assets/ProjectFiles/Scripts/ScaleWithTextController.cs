@@ -36,26 +36,31 @@ public class ScaleWithTextController : MonoBehaviour
 
     [Header("Scale Object")]
     [SerializeField] private GameObject scaleObject;
+    [Tooltip("Transform target used when active on configured page index (e.g. Scale_Slide_pos).")]
+    [SerializeField] private Transform originalTransform;
 
     [Header("Main Camera")]
     [SerializeField] private Camera mainCamera;
 
     [Header("Measurement Poses (cycled on tap)")]
-    [Tooltip("Add poses in order. Last tap returns to original transform.")]
+    [Tooltip("Add poses in order. Last tap returns to active transform position.")]
     public List<MeasurementPose> measurementPoses = new List<MeasurementPose>();
 
     [Header("Movement Settings")]
     [SerializeField] private float moveDuration = 1.5f;
 
     [Header("Page Sync")]
-    [Tooltip("Page indices on which this controller accepts input.")]
+    [Tooltip("Page indices on which this controller accepts input and applies its poses.")]
     [SerializeField] private List<int> activePageIndices = new List<int>();
 
-    [Tooltip("If true, resets to original state when leaving an active page.")]
+    [Tooltip("If true, snaps scale to originalTransform (Scale_Slide_pos) when entering an active page index.")]
+    [SerializeField] private bool applyOriginalOnPageEnter = true;
+
+    [Tooltip("If true, resets scale to initial scene position (near pencil) when leaving or on inactive pages.")]
     [SerializeField] private bool resetOnPageLeave = true;
 
     [Header("Events")]
-    [Tooltip("Fires when all poses have been visited and the scale returns to original.")]
+    [Tooltip("Fires when all poses have been visited and the scale returns to active position.")]
     public UnityEvent onAllMeasurementsComplete;
 
     // =========================================================
@@ -63,13 +68,19 @@ public class ScaleWithTextController : MonoBehaviour
     // =========================================================
 
     private bool isMoving = false;
-    private int currentPoseIndex = -1; // -1 = original position
-    private bool isActiveOnCurrentPage = true;
+    private int currentPoseIndex = -1; // -1 = start position
+    private bool isActiveOnCurrentPage = false;
 
-    private Vector3 originalPosition;
-    private Quaternion originalRotation;
-    private Vector3 originalScale;
-    private bool hasOriginalTransform;
+    // Initial Scene Transform (Near Pencil in Editor)
+    private Vector3 initialScenePosition;
+    private Quaternion initialSceneRotation;
+    private Vector3 initialSceneScale;
+
+    // Active Page Transform (Scale_Slide_pos)
+    private Vector3 activePagePosition;
+    private Quaternion activePageRotation;
+    private Vector3 activePageScale;
+    private bool hasActiveTransform;
 
     // =========================================================
     // LIFECYCLE
@@ -77,12 +88,22 @@ public class ScaleWithTextController : MonoBehaviour
 
     private void Awake()
     {
+        // 1. Capture initial scene placement (Near pencil)
         if (scaleObject != null)
         {
-            originalPosition = scaleObject.transform.position;
-            originalRotation = scaleObject.transform.rotation;
-            originalScale = scaleObject.transform.localScale;
-            hasOriginalTransform = true;
+            initialScenePosition = scaleObject.transform.position;
+            initialSceneRotation = scaleObject.transform.rotation;
+            initialSceneScale = scaleObject.transform.localScale;
+        }
+
+        // 2. Capture target transform for active slide index (Scale_Slide_pos)
+        Transform targetSource = originalTransform != null ? originalTransform : (scaleObject != null ? scaleObject.transform : null);
+        if (targetSource != null)
+        {
+            activePagePosition = targetSource.position;
+            activePageRotation = targetSource.rotation;
+            activePageScale = targetSource.localScale;
+            hasActiveTransform = true;
         }
     }
 
@@ -102,7 +123,6 @@ public class ScaleWithTextController : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
 
-        // Hide all measurement texts at start
         HideAllTexts();
     }
 
@@ -144,7 +164,7 @@ public class ScaleWithTextController : MonoBehaviour
 
     private void TryClickScale(Vector2 screenPosition)
     {
-        if (scaleObject == null) return; // null guard
+        if (scaleObject == null) return;
 
         Ray ray = mainCamera.ScreenPointToRay(screenPosition);
         RaycastHit[] hits = Physics.RaycastAll(ray, 1000f);
@@ -173,14 +193,14 @@ public class ScaleWithTextController : MonoBehaviour
 
         currentPoseIndex++;
 
-        // Past last pose -> return to original
+        // Past last pose -> return to active transform (Scale_Slide_pos)
         if (currentPoseIndex >= measurementPoses.Count)
         {
             currentPoseIndex = -1;
 
-            if (hasOriginalTransform)
+            if (hasActiveTransform)
             {
-                yield return StartCoroutine(AnimateScaleTo(originalPosition, originalRotation, originalScale));
+                yield return StartCoroutine(AnimateScaleTo(activePagePosition, activePageRotation, activePageScale));
             }
 
             onAllMeasurementsComplete?.Invoke();
@@ -203,12 +223,10 @@ public class ScaleWithTextController : MonoBehaviour
             pose.targetTransform.localScale
         ));
 
-        // Reveal text for this pose
         if (pose.measurementText != null)
         {
             pose.measurementText.SetActive(true);
 
-            // Optional pop-in
             pose.measurementText.transform.localScale = Vector3.zero;
             float t = 0f;
             while (t < 0.25f)
@@ -261,30 +279,69 @@ public class ScaleWithTextController : MonoBehaviour
 
     private void HandlePageChanged(int pageIndex)
     {
-        isActiveOnCurrentPage = activePageIndices.Count == 0 || activePageIndices.Contains(pageIndex);
+        bool isMatchingPage = activePageIndices.Count == 0 || activePageIndices.Contains(pageIndex);
 
-        if (!isActiveOnCurrentPage && resetOnPageLeave)
-            ResetController();
+        if (isMatchingPage)
+        {
+            isActiveOnCurrentPage = true;
+            if (applyOriginalOnPageEnter)
+            {
+                ApplyActivePageTransform();
+            }
+        }
+        else
+        {
+            isActiveOnCurrentPage = false;
+            if (resetOnPageLeave)
+            {
+                ResetToInitialSceneTransform();
+            }
+        }
     }
 
     // =========================================================
-    // RESET
+    // RESET & UTILS
     // =========================================================
 
-    public void ResetController()
+    /// <summary>
+    /// Snaps scale object to the target transform configured for Index 10 (Scale_Slide_pos).
+    /// </summary>
+    public void ApplyActivePageTransform()
     {
+        if (scaleObject == null || !hasActiveTransform) return;
+
         StopAllCoroutines();
         isMoving = false;
         currentPoseIndex = -1;
 
-        if (scaleObject != null && hasOriginalTransform)
-        {
-            scaleObject.transform.position = originalPosition;
-            scaleObject.transform.rotation = originalRotation;
-            scaleObject.transform.localScale = originalScale;
-        }
+        scaleObject.transform.position = activePagePosition;
+        scaleObject.transform.rotation = activePageRotation;
+        scaleObject.transform.localScale = activePageScale;
 
         HideAllTexts();
+    }
+
+    /// <summary>
+    /// Resets scale object back to its scene starting position (near pencil).
+    /// </summary>
+    public void ResetToInitialSceneTransform()
+    {
+        if (scaleObject == null) return;
+
+        StopAllCoroutines();
+        isMoving = false;
+        currentPoseIndex = -1;
+
+        scaleObject.transform.position = initialScenePosition;
+        scaleObject.transform.rotation = initialSceneRotation;
+        scaleObject.transform.localScale = initialSceneScale;
+
+        HideAllTexts();
+    }
+
+    public void ResetController()
+    {
+        ResetToInitialSceneTransform();
     }
 
     private void HideAllTexts()
@@ -295,10 +352,6 @@ public class ScaleWithTextController : MonoBehaviour
                 pose.measurementText.SetActive(false);
         }
     }
-
-    // =========================================================
-    // UTILITIES
-    // =========================================================
 
     private bool IsPartOfObject(GameObject hitObject, GameObject targetObject)
     {
@@ -317,17 +370,11 @@ public class ScaleWithTextController : MonoBehaviour
     // PUBLIC HELPERS
     // =========================================================
 
-    /// <summary>
-    /// Programmatically advance to the next pose.
-    /// </summary>
     public void NextPose()
     {
-        if (!isMoving)
+        if (!isMoving && isActiveOnCurrentPage)
             StartCoroutine(AdvancePoseRoutine());
     }
 
-    /// <summary>
-    /// Returns the current pose index (-1 = original).
-    /// </summary>
     public int GetCurrentPoseIndex() => currentPoseIndex;
 }
