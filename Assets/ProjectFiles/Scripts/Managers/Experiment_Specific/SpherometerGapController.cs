@@ -100,6 +100,9 @@ public class SpherometerGapController : MonoBehaviour
     [Tooltip("Name of the Animator state the paper animation returns to on reset (e.g. Default_State).")]
     [SerializeField] private string defaultStateName = "Default_State";
 
+    [Tooltip("Duration (in seconds) for paper to lerp back to start position.")]
+    [SerializeField] private float returnToStartDuration = 0.5f;
+
     [Header("Interaction")]
     [Tooltip("Collider used to detect clicks on the paper.")]
     [SerializeField] private Collider paperClickCollider;
@@ -216,12 +219,7 @@ public class SpherometerGapController : MonoBehaviour
             return;
 
         currentConfig.paperObject.position = currentConfig.startPosition.position;
-        // currentConfig.paperObject.rotation = currentConfig.startPosition.rotation;
 
-        // The Animator only drives the child "Paper" object's local transform.
-        // Snapping the parent above does nothing to that child, so without this
-        // the child can be left visually wherever the last PassThrough/Blocked
-        // clip ended. Force it back to the bind pose in the same frame.
         if (paperAnimator != null && !string.IsNullOrEmpty(defaultStateName))
         {
             ResetAllTriggers();
@@ -241,12 +239,11 @@ public class SpherometerGapController : MonoBehaviour
 
         if (isProcessingTest)
         {
-            Debug.Log("[SpherometerGap] Click ignored: test in progress.");
+            Debug.Log("[SpherometerGap] Click ignored: test or movement in progress.");
             return;
         }
 
         Ray ray = interactionCamera.ScreenPointToRay(screenPosition);
-
         RaycastHit[] hits = Physics.RaycastAll(ray, Mathf.Infinity);
 
         bool hitPaper = false;
@@ -263,7 +260,14 @@ public class SpherometerGapController : MonoBehaviour
         {
             if (waitingForPaperRemoval)
             {
-                RemovePaperAfterFirstTest();
+                ReturnPaperToStartAfterFirstTest();
+                return;
+            }
+
+            // Block paper click if spherometer adjustment has not occurred yet
+            if (testCount == 1 && currentConfig.requiresSpherometerAdjustment && !secondTestUnlocked)
+            {
+                Debug.Log("[SpherometerGap] Paper locked. Adjust spherometer first.");
                 return;
             }
 
@@ -275,9 +279,6 @@ public class SpherometerGapController : MonoBehaviour
 
     #region Test Execution
 
-    /// <summary>
-    /// Main entry point for running a paper test.
-    /// </summary>
     public void ExecutePaperTest()
     {
         if (isProcessingTest) return;
@@ -330,61 +331,43 @@ public class SpherometerGapController : MonoBehaviour
         isProcessingTest = true;
         testCount++;
 
-        // Position paper for test
         PositionPaper(config.paperObject, config.testPosition);
         yield return new WaitForSeconds(0.1f);
 
-        // Determine result
         PaperTestResult result = DetermineTestResult(config);
         Debug.Log($"[SpherometerGap] Test #{testCount}: {result}");
 
-        // Snap FilterPaper's own transform to the correct end target for this
-        // result BEFORE the animation plays. The animator clip only animates
-        // the child "Paper" object's local transform - it does not move the
-        // parent - so the parent has to be placed here to match the outcome
-        // (Filter_paper_Gap for PassThrough, Filter_paper_No_Gap for Blocked).
         Transform endTarget = GetEndPositionForResult(config, result);
         if (endTarget != null)
             PositionPaper(config.paperObject, endTarget);
 
-        // Play animation and wait
         if (paperAnimator != null)
         {
             yield return PlayAnimationAndWait(result);
         }
         else
         {
-            // Fallback positioning (only relevant if no animator is assigned)
             if (endTarget == null && result == PaperTestResult.Blocked && config.blockedPosition != null)
                 PositionPaper(config.paperObject, config.blockedPosition);
 
             yield return new WaitForSeconds(0.5f);
         }
 
-        // Handle completion
         HandleTestCompletion(config);
         isProcessingTest = false;
     }
 
     private PaperTestResult DetermineTestResult(SlideConfiguration config)
     {
-        // Physics-based override
         if (config.gapTarget != null)
         {
             float distance = Vector3.Distance(config.paperObject.position, config.gapTarget.position);
             return distance <= config.gapThreshold ? PaperTestResult.PassThrough : PaperTestResult.Blocked;
         }
 
-        // Preset result based on test count
         return testCount == 1 ? config.firstTestResult : config.secondTestResult;
     }
 
-    /// <summary>
-    /// Maps a test result to the Transform that FilterPaper should be snapped
-    /// to for that outcome (Filter_paper_Gap for PassThrough, Filter_paper_No_Gap
-    /// for Blocked). Falls back to the legacy blockedPosition if the new fields
-    /// aren't assigned, and returns null if nothing is set (no repositioning).
-    /// </summary>
     private Transform GetEndPositionForResult(SlideConfiguration config, PaperTestResult result)
     {
         if (result == PaperTestResult.PassThrough)
@@ -400,11 +383,9 @@ public class SpherometerGapController : MonoBehaviour
         string trigger = result == PaperTestResult.PassThrough ? passThroughTrigger : blockedTrigger;
         paperAnimator.SetTrigger(trigger);
 
-        // Wait for animator transition
         yield return null;
         yield return null;
 
-        // Read animation length
         AnimatorStateInfo stateInfo = paperAnimator.GetCurrentAnimatorStateInfo(0);
         float waitTime = stateInfo.length > 0.01f ? stateInfo.length : 1.5f;
         waitTime += animationBufferTime;
@@ -417,19 +398,7 @@ public class SpherometerGapController : MonoBehaviour
         if (testCount == 1)
         {
             config.OnFirstTestComplete?.Invoke();
-
-            // Require one additional click on the paper to remove it after
-            // the first test, as shown in the experiment flow.
             waitingForPaperRemoval = true;
-
-            if (!config.requiresSpherometerAdjustment)
-            {
-                Debug.Log("[SpherometerGap] First test done. Paper removal required before continuing.");
-            }
-            else
-            {
-                Debug.Log("[SpherometerGap] First test done. Click paper once more to remove it, then adjust the spherometer.");
-            }
         }
         else if (testCount == 2)
         {
@@ -443,22 +412,47 @@ public class SpherometerGapController : MonoBehaviour
 
     #endregion
 
-    /// <summary>
-    /// Removes the paper after the first gap test.
-    /// This is the extra paper click shown in the experiment sequence.
-    /// The paper is restored when the second test is unlocked.
-    /// </summary>
-    private void RemovePaperAfterFirstTest()
+    #region Smooth Paper Return
+
+    private void ReturnPaperToStartAfterFirstTest()
     {
         waitingForPaperRemoval = false;
 
-        if (currentConfig?.paperObject == null)
+        if (currentConfig?.paperObject == null || currentConfig.startPosition == null)
             return;
 
-        currentConfig.paperObject.gameObject.SetActive(false);
-
-        Debug.Log($"[SpherometerGap] Paper removed after first test on page {currentPageIndex}.");
+        StartCoroutine(LerpPaperToPosition(currentConfig.paperObject, currentConfig.startPosition, returnToStartDuration));
     }
+
+    private IEnumerator LerpPaperToPosition(Transform paper, Transform target, float duration)
+    {
+        isProcessingTest = true;
+
+        if (paperAnimator != null && !string.IsNullOrEmpty(defaultStateName))
+        {
+            ResetAllTriggers();
+            paperAnimator.Play(defaultStateName, 0, 0f);
+            paperAnimator.Update(0f);
+        }
+
+        Vector3 startPos = paper.position;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            paper.position = Vector3.Lerp(startPos, target.position, t);
+            yield return null;
+        }
+
+        paper.position = target.position;
+
+        isProcessingTest = false;
+        Debug.Log($"[SpherometerGap] Paper returned to start position. Waiting for spherometer adjustment.");
+    }
+
+    #endregion
 
     #region Positioning
 
@@ -466,12 +460,8 @@ public class SpherometerGapController : MonoBehaviour
     {
         if (paper == null || target == null) return;
         paper.position = target.position;
-        // paper.rotation = target.rotation;
     }
 
-    /// <summary>
-    /// Moves paper to a specific position via script or UI button.
-    /// </summary>
     public void MovePaperTo(PaperPosition position)
     {
         var config = GetConfiguration(currentPageIndex);
@@ -495,9 +485,6 @@ public class SpherometerGapController : MonoBehaviour
 
     #region Spherometer Integration
 
-    /// <summary>
-    /// Call from SpherometerStepController after screw adjustment.
-    /// </summary>
     public void UnlockSecondTest()
     {
         if (testCount != 1)
@@ -507,15 +494,7 @@ public class SpherometerGapController : MonoBehaviour
         }
 
         secondTestUnlocked = true;
-
-        // Bring the paper back for the second test after the Spherometer adjustment.
-        if (currentConfig?.paperObject != null)
-        {
-            currentConfig.paperObject.gameObject.SetActive(true);
-            ResetPaperToStart();
-        }
-
-        Debug.Log($"[SpherometerGap] Second test unlocked on page {currentPageIndex}. Paper restored for second test.");
+        Debug.Log($"[SpherometerGap] Second test unlocked on page {currentPageIndex}. Ready for test click.");
     }
 
     #endregion
@@ -547,7 +526,6 @@ public class SpherometerGapController : MonoBehaviour
         PageNavigationController.RequestNavigationUnlock();
     }
 
-    // State inspectors
     public bool IsTestInProgress => isProcessingTest;
     public int CompletedTestCount => testCount;
     public bool IsSecondTestUnlocked => secondTestUnlocked;
