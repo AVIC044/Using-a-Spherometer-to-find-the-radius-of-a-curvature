@@ -12,13 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d01fd2d64a9249049aaa77d5c12a82fe, type: 3}
   m_Name: Question 1
   m_EditorClassIdentifier: 
-  questionText: Human cheek cells represent which type of tissue?
+  questionText: 'A spherometer can measure the radius of curvature of convex surfaces '
   referenceImage: {fileID: 0}
-  explanationText: The angle between the normal and the reflected ray is known as
-    the angle of reflection.
+  explanationText: A spherometer can be used to measure the radius of curvature of
+    both covex and concave surface. it is also used to measure the thickness of objects
+    such as metal plates.
   options:
-  - Muscular tissue
-  - Epithelial tissue
-  - Connective tissue
-  - Nervous tissue
+  - True
+  - False
   correctOptionIndex: 1

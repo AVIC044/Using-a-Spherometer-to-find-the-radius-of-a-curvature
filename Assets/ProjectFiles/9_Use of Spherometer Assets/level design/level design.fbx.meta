@@ -3,7 +3,67 @@ guid: 9470fa8fd9327684093f36d80d9c9626
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Glass_M
+    second: {fileID: 2100000, guid: 8b8201ce15da23f49be9a2dc7ddf8e72, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Glass_M1
+    second: {fileID: 2100000, guid: 4e6392554c5e6f94ab915bff76118a87, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Metal Dark1
+    second: {fileID: 2100000, guid: 7332952401156be4d889db57a7bc9682, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Scale 0-104
+    second: {fileID: 2100000, guid: a60108f664a18904586e76bb6fd97ed5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Spherometer
+    second: {fileID: 2100000, guid: 7ad7edd657ff5524992c1b19c2482b95, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Table Base Color1
+    second: {fileID: 2100000, guid: 67a47a37e000272489280616022ac60b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Teal Emission_
+    second: {fileID: 2100000, guid: 63c6110cdd82842479c988297f080aca, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Teal No Emission1
+    second: {fileID: 2100000, guid: 35ba5eeef91b6db43a0831f580fabedb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert1
+    second: {fileID: 2100000, guid: 84064d4c40dcd304c8ff80d6589dd0ff, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert2
+    second: {fileID: 2100000, guid: 54185752f89dc9641b01fbdcf0349244, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert3
+    second: {fileID: 2100000, guid: 9eec95aadd49fd74685a10ca55326530, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert6
+    second: {fileID: 2100000, guid: 1bd686b03dfcee240ac40e5899ab7880, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
